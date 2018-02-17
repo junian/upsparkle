@@ -1,0 +1,3 @@
+[submodule "external/winsparkle"]
+	path = external/winsparkle
+	url = https://github.com/junian/winsparkle.git
