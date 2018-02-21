@@ -18,8 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" />
-    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" />
+    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" Pack="true" PackagePath="build\x86\WinSparkle.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" Pack="true" PackagePath="build\x64\WinSparkle.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

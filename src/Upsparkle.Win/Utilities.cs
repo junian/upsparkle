@@ -41,7 +41,12 @@ namespace Juniansoft.Upsparkle
                 byte[] data = new BinaryReader(s).ReadBytes((int)s.Length);
 
                 string assemblyPath = Path.GetDirectoryName(assembly.Location);
-                tempDllPath = Path.Combine(assemblyPath, libraryName);
+                //tempDllPath = Path.Combine(assemblyPath, libraryName);
+                tempDllPath = Path.Combine(Path.GetTempPath(), "Upsparkle");
+                if (!Directory.Exists(tempDllPath))
+                    Directory.CreateDirectory(tempDllPath);
+                tempDllPath = Path.Combine(tempDllPath, libraryName);
+
                 File.WriteAllBytes(tempDllPath, data);
             }
 

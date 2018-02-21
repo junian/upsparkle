@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -11,33 +12,31 @@ namespace Juniansoft.Upsparkle
 
     public class UpsparkleUpdater: IUpsparkleUpdater
     {
+        private const string libraryName = "WinSparkle.dll";
+
         private UpsparkleUpdater()
         {
             var dllpath = string.Empty;
 
+            var resourceName = string.Empty;
+            var assembly = Assembly.GetExecutingAssembly();
+            
             if (IntPtr.Size == 4)
             {
                 // 32-bit
-                //Utilites.LoadUnmanagedLibraryFromResource(
-                //    Assembly.GetExecutingAssembly(),
-                //    "WinSparkleDotNet.x86.WinSparkle.dll",
-                //    "WinSparkle.dll"
-                //    );
-                dllpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "x86\\WinSparkle.dll");
+                resourceName = $"{typeof(IUpsparkleUpdater).Namespace}.x86.{libraryName}";
+                dllpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "x86");
             }
             else
             {
                 // 64-bit
-                //Utilites.LoadUnmanagedLibraryFromResource(
-                //    Assembly.GetExecutingAssembly(),
-                //    "WinSparkleDotNet.x64.WinSparkle.dll",
-                //    "WinSparkle.dll"
-                //    );
-                dllpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "x64\\WinSparkle.dll");
+                resourceName = $"{typeof(IUpsparkleUpdater).Namespace}.x64.{libraryName}";
+                dllpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "x64");
             }
+            
+            Utilites.LoadUnmanagedLibrary(Path.Combine(dllpath, libraryName));
 
-            Debug.WriteLine("DLL Path: " + dllpath);
-            Utilites.LoadUnmanagedLibrary(dllpath);
+            //Utilites.LoadUnmanagedLibraryFromResource(assembly, resourceName, libraryName);
 
             SetErrorCallback(() => Error?.Invoke(this, new EventArgs()));
             SetCanShutdownCallback(() => CanShutdown?.Invoke(this, new EventArgs()));
