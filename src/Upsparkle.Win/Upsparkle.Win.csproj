@@ -12,4 +12,14 @@
     <Compile Include="..\Upsparkle\IUpsparkleUpdater.cs" Link="IUpsparkleUpdater.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="x64\" />
+    <Folder Include="x86\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" />
+    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" />
+  </ItemGroup>
+
 </Project>
