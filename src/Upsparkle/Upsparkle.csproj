@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
+    <AssemblyName>Upsparkle</AssemblyName>
   </PropertyGroup>
 
 </Project>
