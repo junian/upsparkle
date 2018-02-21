@@ -6,4 +6,8 @@
     <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Upsparkle\IUpsparkleUpdater.cs" Link="IUpsparkleUpdater.cs" />
+  </ItemGroup>
+
 </Project>
