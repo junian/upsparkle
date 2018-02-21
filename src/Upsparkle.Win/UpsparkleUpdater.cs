@@ -7,6 +7,8 @@ using System.Text;
 
 namespace Juniansoft.Upsparkle
 {
+    internal delegate void Callback();
+
     public class UpsparkleUpdater: IUpsparkleUpdater
     {
         private UpsparkleUpdater()
@@ -36,9 +38,24 @@ namespace Juniansoft.Upsparkle
 
             Debug.WriteLine("DLL Path: " + dllpath);
             Utilites.LoadUnmanagedLibrary(dllpath);
+
+            SetErrorCallback(() => Error?.Invoke(this, new EventArgs()));
+            SetCanShutdownCallback(() => CanShutdown?.Invoke(this, new EventArgs()));
+            SetShutdownRequestCallback(() => ShutdownRequest?.Invoke(this, new EventArgs()));
+            SetDidFindUpdateCallback(() => DidFindUpdate?.Invoke(this, new EventArgs()));
+            SetDidNotFindUpdateCallback(() => DidNotFindUpdate?.Invoke(this, new EventArgs()));
+            SetUpdateCancelledCallback(() => UpdateCancelled?.Invoke(this, new EventArgs()));
         }
 
         private static UpsparkleUpdater _current;
+
+        public event EventHandler<EventArgs> Error;
+        public event EventHandler<EventArgs> CanShutdown;
+        public event EventHandler<EventArgs> ShutdownRequest;
+        public event EventHandler<EventArgs> DidFindUpdate;
+        public event EventHandler<EventArgs> DidNotFindUpdate;
+        public event EventHandler<EventArgs> UpdateCancelled;
+
         public static UpsparkleUpdater Current
         {
             get { return _current ?? (_current = new UpsparkleUpdater()); }
@@ -132,32 +149,32 @@ namespace Juniansoft.Upsparkle
             win_sparkle_set_registry_path(path);
         }
 
-        public void SetErrorCallback(Callback callback)
+        private void SetErrorCallback(Callback callback)
         {
             win_sparkle_set_error_callback(callback);
         }
 
-        public void SetCanShutdownCallback(Callback callback)
+        private void SetCanShutdownCallback(Callback callback)
         {
             win_sparkle_set_can_shutdown_callback(callback);
         }
 
-        public void SetShutdownRequestCallback(Callback callback)
+        private void SetShutdownRequestCallback(Callback callback)
         {
             win_sparkle_set_shutdown_request_callback(callback);
         }
 
-        public void SetDidFindUpdateCallback(Callback callback)
+        private void SetDidFindUpdateCallback(Callback callback)
         {
             win_sparkle_set_did_find_update_callback(callback);
         }
 
-        public void SetDidNotFindUpdateCallback(Callback callback)
+        private void SetDidNotFindUpdateCallback(Callback callback)
         {
             win_sparkle_set_did_not_find_update_callback(callback);
         }
 
-        public void SetUpdateCancelledCallback(Callback callback)
+        private void SetUpdateCancelledCallback(Callback callback)
         {
             win_sparkle_set_update_cancelled_callback(callback);
         }

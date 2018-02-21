@@ -4,8 +4,6 @@ using System.Text;
 
 namespace Juniansoft.Upsparkle
 {
-    public delegate void Callback();
-
     internal interface IUpsparkleUpdater
     {
         void Init();
@@ -22,12 +20,12 @@ namespace Juniansoft.Upsparkle
         TimeSpan UpdateCheckInterval { get; set; }
         DateTime LastCheckTime { get; }
 
-        void SetErrorCallback(Callback callback);
-        void SetCanShutdownCallback(Callback callback);
-        void SetShutdownRequestCallback(Callback callback);
-        void SetDidFindUpdateCallback(Callback callback);
-        void SetDidNotFindUpdateCallback(Callback callback);
-        void SetUpdateCancelledCallback(Callback callback);
+        event EventHandler<EventArgs> Error;
+        event EventHandler<EventArgs> CanShutdown;
+        event EventHandler<EventArgs> ShutdownRequest;
+        event EventHandler<EventArgs> DidFindUpdate;
+        event EventHandler<EventArgs> DidNotFindUpdate;
+        event EventHandler<EventArgs> UpdateCancelled;
 
         void CheckUpdateWithUI();
         void CheckUpdateWithUIAndInstall();

@@ -11,6 +11,13 @@ namespace Juniansoft.Upsparkle
 
         public DateTime LastCheckTime => throw new NotImplementedException();
 
+        public event EventHandler<EventArgs> Error;
+        public event EventHandler<EventArgs> CanShutdown;
+        public event EventHandler<EventArgs> ShutdownRequest;
+        public event EventHandler<EventArgs> DidFindUpdate;
+        public event EventHandler<EventArgs> DidNotFindUpdate;
+        public event EventHandler<EventArgs> UpdateCancelled;
+
         public void CheckUpdateWithoutUI()
         {
             throw new NotImplementedException();
@@ -50,27 +57,7 @@ namespace Juniansoft.Upsparkle
         {
             throw new NotImplementedException();
         }
-
-        public void SetCanShutdownCallback(Callback callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetDidFindUpdateCallback(Callback callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetDidNotFindUpdateCallback(Callback callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetErrorCallback(Callback callback)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public void SetLang(string lang)
         {
             throw new NotImplementedException();
@@ -85,15 +72,6 @@ namespace Juniansoft.Upsparkle
         {
             throw new NotImplementedException();
         }
-
-        public void SetShutdownRequestCallback(Callback callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetUpdateCancelledCallback(Callback callback)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
