@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
     <AssemblyName>Upsparkle</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Upsparkle.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>
