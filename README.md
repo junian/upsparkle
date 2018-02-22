@@ -1,3 +1,6 @@
+[![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg)](https://www.nuget.org/packages/Upsparkle/)
+[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg)](https://www.nuget.org/packages/Upsparkle/)
+
 ## About
 
 Cross-platform updater for .NET and Xamarin. This library brings the latest platform-specific self-updating framework to Xamarin Mac / .NET Windows applications via a custom native implementation. This is made possible by two native libraries:
