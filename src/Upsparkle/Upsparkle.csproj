@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net20</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;net20</TargetFrameworks>
     
     <AssemblyName>Upsparkle</AssemblyName>
     <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
@@ -59,6 +59,9 @@
     <None Include="..\..\README.md" Link="README.md" Pack="true" />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
     <Compile Include="Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
   </ItemGroup>
 
 </Project>

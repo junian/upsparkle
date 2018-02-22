@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Juniansoft.Upsparkle
 {
-    internal interface IUpsparkleUpdater
+    public interface IUpsparkleUpdater
     {
         void Init();
         void Cleanup();
