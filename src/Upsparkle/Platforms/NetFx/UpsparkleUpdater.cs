@@ -14,7 +14,7 @@ namespace Juniansoft.Upsparkle
     {
         private const string libraryName = "WinSparkle.dll";
 
-        private UpsparkleUpdater()
+        internal UpsparkleUpdater()
         {
             var dllpath = string.Empty;
 
@@ -45,21 +45,14 @@ namespace Juniansoft.Upsparkle
             SetDidNotFindUpdateCallback(() => DidNotFindUpdate?.Invoke(this, new EventArgs()));
             SetUpdateCancelledCallback(() => UpdateCancelled?.Invoke(this, new EventArgs()));
         }
-
-        private static UpsparkleUpdater _current;
-
+        
         public event EventHandler<EventArgs> Error;
         public event EventHandler<EventArgs> CanShutdown;
         public event EventHandler<EventArgs> ShutdownRequest;
         public event EventHandler<EventArgs> DidFindUpdate;
         public event EventHandler<EventArgs> DidNotFindUpdate;
         public event EventHandler<EventArgs> UpdateCancelled;
-
-        public static UpsparkleUpdater Current
-        {
-            get { return _current ?? (_current = new UpsparkleUpdater()); }
-        }
-
+        
         #region Init and Cleanup
 
         public void Cleanup()

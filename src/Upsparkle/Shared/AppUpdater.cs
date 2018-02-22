@@ -21,7 +21,7 @@ namespace Juniansoft.Upsparkle
         private static IUpsparkleUpdater GetInstance()
         {
 #if PORTABLE || NETSTANDARD1_0 || NETSTANDARD2_0
-            return null;
+            return _instance;
 #else
 #pragma warning disable IDE0022 // Use expression body for methods
             if(_instance == null)

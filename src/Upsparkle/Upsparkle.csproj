@@ -59,9 +59,23 @@
     <None Include="..\..\README.md" Link="README.md" Pack="true" />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
     <Compile Include="Shared\**\*.cs" />
+    <Folder Include="x64\" />
+    <Folder Include="x86\" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net20' ">
+    <Compile Include="Platforms\NetFx\**\*.cs" />
+    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" Pack="true" PackagePath="build\x86\WinSparkle.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" Pack="true" PackagePath="build\x64\WinSparkle.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
+  
 </Project>
