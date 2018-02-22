@@ -56,7 +56,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Link="README.md" Pack="true" />
+    <!--<None Include="..\..\README.md" Link="README.md" Pack="true" />-->
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
     <Compile Include="Shared\**\*.cs" />
     <Folder Include="x64\" />
