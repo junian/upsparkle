@@ -42,5 +42,11 @@
   <ItemGroup>
     <ObjcBindingCoreSource Include="StructsAndEnums.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="..\..\libs\Sparkle\Sparkle.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.ObjcBinding.CSharp.targets" />
 </Project>
