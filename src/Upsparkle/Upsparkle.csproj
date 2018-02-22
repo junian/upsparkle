@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net20</TargetFrameworks>
     
     <AssemblyName>Upsparkle</AssemblyName>
     <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
@@ -54,5 +54,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Link="README.md" Pack="true" />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
+    <Compile Include="Shared\**\*.cs" />
+  </ItemGroup>
 
 </Project>
