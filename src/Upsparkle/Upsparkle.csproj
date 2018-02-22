@@ -61,6 +61,16 @@
     <Compile Include="Shared\**\*.cs" />
     <Folder Include="x64\" />
     <Folder Include="x86\" />
+    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" Pack="true" PackagePath="build\x86\WinSparkle.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" Pack="true" PackagePath="build\x64\WinSparkle.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Upsparkle.targets">
+      <PackagePath>build</PackagePath>
+      <Pack>true</Pack>
+    </Content>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
@@ -68,12 +78,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net20' ">
     <Compile Include="Platforms\NetFx\**\*.cs" />
-    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" Pack="true" PackagePath="build\x86\WinSparkle.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" Pack="true" PackagePath="build\x64\WinSparkle.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
