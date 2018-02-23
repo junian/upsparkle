@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Upsparkle.Mac
+namespace Juniansoft.Upsparkle
 {
     public enum SUError
     {
