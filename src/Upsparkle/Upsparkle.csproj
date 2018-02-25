@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>xamarinmac20;netstandard1.0;net20;</TargetFrameworks>
+		<TargetFrameworks>netstandard1.0;xamarinmac20;net20;</TargetFrameworks>
 		<AssemblyName>Upsparkle</AssemblyName>
 		<RootNamespace>Juniansoft.Upsparkle</RootNamespace>
 		<Product>$(AssemblyName) ($(TargetFramework))</Product>
