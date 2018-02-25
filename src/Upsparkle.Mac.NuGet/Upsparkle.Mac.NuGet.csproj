@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>xamarinmac20</TargetFramework>
+    <TargetFramework>xamarin.mac2.0</TargetFramework>
     
-    <AssemblyName>Upsparkle</AssemblyName>
+    <AssemblyName>Upsparkle.Mac.NuGet</AssemblyName>
     <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     
@@ -67,9 +67,14 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.1" PrivateAssets="all" />
+    <ProjectReference Include="..\Upsparkle.Mac\Upsparkle.Mac.csproj" PrivateAssets="all">
+    </ProjectReference>
+    <None Include="..\Upsparkle.Mac\bin\$(Configuration)\Upsparkle.dll" Pack="true">
+            <PackagePath>lib\net45;lib\net20</PackagePath>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
-    <!--
+  <!--
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
-    -->
+  -->
 </Project>
