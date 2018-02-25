@@ -1,85 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;net20</TargetFrameworks>
-    
-    <AssemblyName>Upsparkle</AssemblyName>
-    <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
-    <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    
-    <ReleaseVersion>0.1.1</ReleaseVersion>
-    <Version>0.1.1</Version>
-    <AssemblyVersion>0.1.1.0</AssemblyVersion>
-    <FileVersion>0.1.1.0</FileVersion>
-    
-    <Authors>Junian Triajianto</Authors>
-    <Owners>junian</Owners>
-    
-    <Title>Upsparkle</Title>
-    <PackageId>Upsparkle</PackageId>
-    <PackageIconUrl></PackageIconUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/junian/upsparkle/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://lab.junian.net/upsparkle/</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageTags>updater,sparkle,winsparkle</PackageTags>
-    <PackageReleaseNotes>
+	<PropertyGroup>
+		<TargetFrameworks>xamarinmac20;netstandard1.0;net20;</TargetFrameworks>
+		<AssemblyName>Upsparkle</AssemblyName>
+		<RootNamespace>Juniansoft.Upsparkle</RootNamespace>
+		<Product>$(AssemblyName) ($(TargetFramework))</Product>
+		<ReleaseVersion>0.1.1</ReleaseVersion>
+		<VersionPrefix>0.1.1</VersionPrefix>
+		<VersionSuffix>beta2</VersionSuffix>
+		<AssemblyVersion>0.1.1.0</AssemblyVersion>
+		<FileVersion>0.1.1.0</FileVersion>
+		<Authors>Junian Triajianto</Authors>
+		<Owners>junian</Owners>
+		<Title>Upsparkle</Title>
+		<PackageId>Upsparkle</PackageId>
+		<PackageIconUrl>
+		</PackageIconUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/junian/upsparkle/master/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://lab.junian.net/upsparkle/</PackageProjectUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageTags>updater,sparkle,winsparkle</PackageTags>
+		<PackageReleaseNotes>
       v0.1.0
 
       - initial test release
     </PackageReleaseNotes>
-    
-    <PackOnBuild>true</PackOnBuild>
-    
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Upsparkle.snk</AssemblyOriginatorKeyFile>
-  
-    <NeutralLanguage>en</NeutralLanguage>
-    <LangVersion>default</LangVersion>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    
-    <Summary>Easy-to-use updater library for Windows and macOS Desktop .NET app</Summary>
-    <Description>Easy-to-use updater library for Windows and macOS Desktop .NET app</Description>
-    <Copyright>Copyright (c) 2018</Copyright>
-    
-    <RepositoryUrl>https://github.com/junian/upsparkle</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    
-    <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <!-- Workaround until Xamarin supports PPDB -->
-    <UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
-    <DebugType>full</DebugType>
-
-    <DefineConstants>$(DefineConstants);</DefineConstants>
-
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    
-  </PropertyGroup>
-
-  <ItemGroup>
-    <!--<None Include="..\..\README.md" Link="README.md" Pack="true" />-->
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
-    <Compile Include="Shared\**\*.cs" />
-    <Folder Include="x64\" />
-    <Folder Include="x86\" />
-    <None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll" Pack="true" PackagePath="build\net20\x86">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll" Pack="true" PackagePath="build\net20\x64">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Content Include="Upsparkle.targets">
-      <PackagePath>build\net20</PackagePath>
-      <Pack>true</Pack>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net20' ">
-    <Compile Include="Platforms\NetFx\**\*.cs" />
-  </ItemGroup>
-
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
-  
+		<PackOnBuild>true</PackOnBuild>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>Upsparkle.snk</AssemblyOriginatorKeyFile>
+		<NeutralLanguage>en</NeutralLanguage>
+		<LangVersion>default</LangVersion>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<Summary>Easy-to-use updater library for Windows and macOS Desktop .NET app</Summary>
+		<Description>Easy-to-use updater library for Windows and macOS Desktop .NET app</Description>
+		<Copyright>Copyright (c) 2018</Copyright>
+		<RepositoryUrl>https://github.com/junian/upsparkle</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
+		<!-- Workaround until Xamarin supports PPDB -->
+		<UseFullSemVerForNuGet>false</UseFullSemVerForNuGet>
+		<DebugType>full</DebugType>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+	</PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'xamarinmac20' ">
+        <MacResourcePrefix>Resources</MacResourcePrefix>
+        <ProjectTypeGuids>{810C163F-4746-4721-8B8E-88A3673A62EA};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <OutputPath>bin\$(Configuration)\$(TargetFramework)</OutputPath>
+    </PropertyGroup>
+	<ItemGroup>
+		<!--<None Include="..\..\README.md" Link="README.md" Pack="true" />-->
+		<PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.1" PrivateAssets="all" />
+		<Compile Include="Shared\**\*.cs" />
+		<Folder Include="x64\" />
+		<Folder Include="x86\" />
+		<None Include="..\..\libs\WinSparkle\Release\WinSparkle.dll" Link="x86\WinSparkle.dll">
+            <CopyToOutputDirectory Condition=" '$(TargetFramework)' == 'net20' ">Always</CopyToOutputDirectory>
+			<Pack>true</Pack>
+			<PackagePath>build\net20\x86</PackagePath>
+		</None>
+		<None Include="..\..\libs\WinSparkle\x64\Release\WinSparkle.dll" Link="x64\WinSparkle.dll">
+            <CopyToOutputDirectory Condition=" '$(TargetFramework)' == 'net20' ">Always</CopyToOutputDirectory>
+			<Pack>true</Pack>
+			<PackagePath>build\net20\x64</PackagePath>
+		</None>
+		<None Include="Upsparkle.targets">
+			<Pack>true</Pack>
+			<PackagePath>build\net20</PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net20' ">
+		<Compile Include="Platforms\NetFx\**\*.cs" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'xamarinmac20' ">
+        <Reference Include="System" />
+        <Reference Include="System.Core" />
+        <Reference Include="Xamarin.Mac" />
+		<NativeReference Include="..\..\libs\Sparkle\Sparkle.framework">
+			<Kind>Framework</Kind>
+			<SmartLink>False</SmartLink>
+		</NativeReference>
+		<Compile Include="Platforms\XamMac\**\*.cs" />
+		<Compile Remove="Platforms\XamMac\StructsAndEnums.cs" />
+		<Compile Remove="Platforms\XamMac\ApiDefinition.cs" />
+		<ObjcBindingCoreSource Include="Platforms\XamMac\StructsAndEnums.cs" />
+		<ObjcBindingApiDefinition Include="Platforms\XamMac\ApiDefinition.cs" />
+	</ItemGroup>
+	<Import Project="$(MSBuildSDKExtrasTargets)" Condition="'$(TargetFramework)' != 'net20' AND '$(TargetFramework)' != 'xamarinmac20' AND Exists('$(MSBuildSDKExtrasTargets)')" />
+    <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.ObjcBinding.CSharp.targets" Condition=" '$(TargetFramework)' == 'xamarinmac20' " />
 </Project>
