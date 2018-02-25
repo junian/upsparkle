@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpsparkleDemo.XamMac", "Ups
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpsparkleDemo.XamMac.Net45", "UpsparkleDemo.XamMac\UpsparkleDemo.XamMac.Net45\UpsparkleDemo.XamMac.Net45.csproj", "{640FD38C-58DA-4944-8199-7426A75CEB0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpsparkleDemo.Core", "UpsparkleDemo.XamMac\UpsparkleDemo.Core\UpsparkleDemo.Core.csproj", "{F578E983-E8DF-47E6-B1B2-4122D272EA99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{640FD38C-58DA-4944-8199-7426A75CEB0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{640FD38C-58DA-4944-8199-7426A75CEB0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{640FD38C-58DA-4944-8199-7426A75CEB0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F578E983-E8DF-47E6-B1B2-4122D272EA99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F578E983-E8DF-47E6-B1B2-4122D272EA99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F578E983-E8DF-47E6-B1B2-4122D272EA99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F578E983-E8DF-47E6-B1B2-4122D272EA99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,5 +56,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C51DC703-AF54-4D80-8D64-30F3A5CF7239} = {86F6C279-1E1A-424C-903C-ED417D92EE9F}
 		{640FD38C-58DA-4944-8199-7426A75CEB0F} = {86F6C279-1E1A-424C-903C-ED417D92EE9F}
+		{F578E983-E8DF-47E6-B1B2-4122D272EA99} = {86F6C279-1E1A-424C-903C-ED417D92EE9F}
 	EndGlobalSection
 EndGlobal
