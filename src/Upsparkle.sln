@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Upsparkle.NuGet", "Upsparkl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Upsparkle.Mac.NuGet", "Upsparkle.Mac.NuGet\Upsparkle.Mac.NuGet.csproj", "{67B9CE52-6DFA-4386-9825-66FACE5F0C6F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{86F6C279-1E1A-424C-903C-ED417D92EE9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpsparkleDemo.XamMac", "UpsparkleDemo.XamMac\UpsparkleDemo.XamMac.csproj", "{C51DC703-AF54-4D80-8D64-30F3A5CF7239}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,11 +30,18 @@ Global
 		{67B9CE52-6DFA-4386-9825-66FACE5F0C6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67B9CE52-6DFA-4386-9825-66FACE5F0C6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67B9CE52-6DFA-4386-9825-66FACE5F0C6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C51DC703-AF54-4D80-8D64-30F3A5CF7239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C51DC703-AF54-4D80-8D64-30F3A5CF7239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C51DC703-AF54-4D80-8D64-30F3A5CF7239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C51DC703-AF54-4D80-8D64-30F3A5CF7239}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E666576-6C9B-422F-BD8D-DAF7C6A32631}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C51DC703-AF54-4D80-8D64-30F3A5CF7239} = {86F6C279-1E1A-424C-903C-ED417D92EE9F}
 	EndGlobalSection
 EndGlobal
