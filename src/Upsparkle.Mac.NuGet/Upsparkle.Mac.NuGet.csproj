@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;xamarinmac20</TargetFrameworks>
+    <TargetFrameworks>xamarin.mac20;net45</TargetFrameworks>
     
     <AssemblyName>Upsparkle</AssemblyName>
     <RootNamespace>Juniansoft.Upsparkle</RootNamespace>
@@ -29,10 +29,7 @@
     </PackageReleaseNotes>
     
     <PackOnBuild>true</PackOnBuild>
-    
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Upsparkle.snk</AssemblyOriginatorKeyFile>
-  
+
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -53,6 +50,22 @@
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-  </PropertyGroup>
 
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.Mac" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
