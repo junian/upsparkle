@@ -1,3 +1,5 @@
+Status: **WORK IN PROGRESS**
+
 [![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg)](https://www.nuget.org/packages/Upsparkle/)
 [![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg)](https://www.nuget.org/packages/Upsparkle/)
 
