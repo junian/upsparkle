@@ -1,6 +1,0 @@
-[submodule "external/winsparkle"]
-	path = external/winsparkle
-	url = https://github.com/junian/winsparkle.git
-[submodule "external/sparkle"]
-	path = external/sparkle
-	url = https://github.com/junian/Sparkle.git
