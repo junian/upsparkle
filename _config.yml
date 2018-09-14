@@ -2,5 +2,5 @@ theme: jekyll-theme-cayman
 title: Upsparkle
 description: Cross-platform native updater for Xamarin/.NET Desktop app
 show_downloads: true
-google_analytics: UA-113890655-6
+google_analytics: UA-90418854-6
 exclude: [external]
