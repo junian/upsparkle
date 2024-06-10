@@ -1,10 +1,10 @@
 Status: **WORK IN PROGRESS**
 
-[![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg)](https://www.nuget.org/packages/Upsparkle/)
-[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg)](https://www.nuget.org/packages/Upsparkle/)
+[![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
+[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 
-[![NuGet](https://img.shields.io/nuget/v/Upsparkle.Mac.svg)](https://www.nuget.org/packages/Upsparkle.Mac/)
-[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.Mac.svg)](https://www.nuget.org/packages/Upsparkle.Mac/)
+[![NuGet](https://img.shields.io/nuget/v/Upsparkle.Mac.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle.Mac/)
+[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.Mac.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle.Mac/)
 
 ## About
 
