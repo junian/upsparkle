@@ -123,11 +123,11 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
         return nsUrl;
     }
 
-    [DllImport("/usr/lib/libSystem.B.dylib", EntryPoint = "CFRetain")]
-    private static extern IntPtr CFRetain(IntPtr cf);
+    [DllImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_retain")]
+    private static extern IntPtr ObjcRetain(IntPtr obj);
 
-    [DllImport("/usr/lib/libSystem.B.dylib", EntryPoint = "CFRelease")]
-    private static extern void CFRelease(IntPtr cf);
+    [DllImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_release")]
+    private static extern void ObjcRelease(IntPtr obj);
 
     // -------------------------------------------------------------------------
     // IUpSparklePlatformImplementation
@@ -163,7 +163,7 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
             throw new InvalidOperationException("Failed to initialize SPUStandardUpdaterController.");
 
         // Retain so the object survives across managed/unmanaged boundary.
-        updaterController = CFRetain(ctrl);
+        updaterController = ObjcRetain(ctrl);
 
         // Get the SPUUpdater from the controller and set the feed URL.
         // Equivalent ObjC: [ctrl.updater setFeedURL:[NSURL URLWithString:appCastUrl]];
@@ -187,7 +187,7 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
     {
         if (updaterController != IntPtr.Zero)
         {
-            CFRelease(updaterController);
+            ObjcRelease(updaterController);
             updaterController = IntPtr.Zero;
         }
     }
