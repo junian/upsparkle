@@ -11,26 +11,34 @@
     <Description>Cross-platform updater for .NET desktop apps.</Description>
   </PropertyGroup>
 
+  <!-- Sparkle.framework (macOS) -->
   <ItemGroup>
-    <None Include="..\..\libs\Sparkle\Sparkle.framework\**\*"
+    <None Include="..\..\runtimes\osx\native\Sparkle.framework\**\*"
           Pack="true"
           PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
-          <Link>libs/Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
+  <!-- WinSparkle (Windows) -->
   <ItemGroup>
-    <None Include="..\..\libs\WinSparkle\WinSparkle.x86_64.dll"
+    <None Include="..\..\runtimes\win-x86\native\WinSparkle.dll"
           Pack="true"
-          PackagePath="runtimes/win-x64/native/WinSparkle.dll">
-      <Link>libs\WinSparkle.x86_64.dll</Link>
+          PackagePath="runtimes/win-x86/native/WinSparkle.dll">
+      <Link>runtimes\win-x86\native\WinSparkle.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\libs\WinSparkle\WinSparkle.arm64.dll"
+    <None Include="..\..\runtimes\win-x64\native\WinSparkle.dll"
+          Pack="true"
+          PackagePath="runtimes/win-x64/native/WinSparkle.dll">
+      <Link>runtimes\win-x64\native\WinSparkle.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\runtimes\win-arm64\native\WinSparkle.dll"
           Pack="true"
           PackagePath="runtimes/win-arm64/native/WinSparkle.dll">
-      <Link>libs\WinSparkle.arm64.dll</Link>
+      <Link>runtimes\win-arm64\native\WinSparkle.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

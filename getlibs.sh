@@ -1,5 +1,7 @@
 #!/bin/sh
 
+RUNTIMES_DIR="runtimes"
+
 mkdir -p libs
 rm -rf libs/*
 
@@ -9,20 +11,23 @@ wget -P libs -i .gitbinmodules
 
 echo "Download finished."
 
-echo "Extracting files ..."
+echo "Extracting Sparkle ..."
 
-mkdir -p libs/Sparkle
-tar -jxvf libs/Sparkle*.tar.xz -C libs/Sparkle
+mkdir -p "${RUNTIMES_DIR}/osx/native"
+tar -Jxf libs/Sparkle*.tar.xz -C "${RUNTIMES_DIR}/osx/native"
 rm libs/Sparkle*.tar.xz
 
-echo "Download and extract WinSparkle"
+echo "Extracting WinSparkle ..."
 
 unzip -o libs/WinSparkle*.zip -d libs
 
-mkdir -p libs/WinSparkle
-mv libs/WinSparkle-*/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86.dll
-mv libs/WinSparkle-*/x64/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86_64.dll
-mv libs/WinSparkle-*/ARM64/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.arm64.dll
+mkdir -p "${RUNTIMES_DIR}/win-x86/native"
+mkdir -p "${RUNTIMES_DIR}/win-x64/native"
+mkdir -p "${RUNTIMES_DIR}/win-arm64/native"
+
+mv libs/WinSparkle-*/Release/WinSparkle.dll          "${RUNTIMES_DIR}/win-x86/native/WinSparkle.dll"
+mv libs/WinSparkle-*/x64/Release/WinSparkle.dll      "${RUNTIMES_DIR}/win-x64/native/WinSparkle.dll"
+mv libs/WinSparkle-*/ARM64/Release/WinSparkle.dll    "${RUNTIMES_DIR}/win-arm64/native/WinSparkle.dll"
 
 rm libs/WinSparkle*.zip
 rm -rf libs/WinSparkle-*

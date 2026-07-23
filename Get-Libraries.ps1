@@ -1,7 +1,8 @@
 # Get-Libraries.ps1
 # Downloads and extracts libraries listed in .gitbinmodules
 
-$LibsDir = Join-Path $PSScriptRoot "libs"
+$LibsDir      = Join-Path $PSScriptRoot "libs"
+$RuntimesDir  = Join-Path $PSScriptRoot "runtimes"
 
 # Clear libs directory contents, preserving .gitkeep
 if (Test-Path $LibsDir) {
@@ -18,7 +19,7 @@ $Urls = Get-Content $ModulesFile | Where-Object { $_.Trim() -ne "" }
 Write-Host "Downloading files ..."
 
 foreach ($Url in $Urls) {
-    $FileName = [System.IO.Path]::GetFileName($Url)
+    $FileName    = [System.IO.Path]::GetFileName($Url)
     $Destination = Join-Path $LibsDir $FileName
     Write-Host "  -> $FileName"
     Invoke-WebRequest -Uri $Url -OutFile $Destination
@@ -27,43 +28,56 @@ foreach ($Url in $Urls) {
 Write-Host "Download finished."
 Write-Host "Extracting files ..."
 
-# Extract Sparkle (tar.xz)
+# --- Sparkle (tar.xz) -> runtimes/osx/native/ ---
 $SparkleArchive = Get-ChildItem -Path $LibsDir -Filter "Sparkle*.tar.xz" | Select-Object -First 1
 if ($SparkleArchive) {
-    $SparkleDir = Join-Path $LibsDir "Sparkle"
-    New-Item -ItemType Directory -Path $SparkleDir | Out-Null
-    Write-Host "Extracting $($SparkleArchive.Name) ..."
-    tar -xJf $SparkleArchive.FullName -C $SparkleDir
+    $OsxNativeDir = Join-Path $RuntimesDir "osx\native"
+    New-Item -ItemType Directory -Path $OsxNativeDir -Force | Out-Null
+    Write-Host "Extracting $($SparkleArchive.Name) -> runtimes/osx/native/ ..."
+    tar -xJf $SparkleArchive.FullName -C $OsxNativeDir
     Remove-Item $SparkleArchive.FullName
 }
 
-# Extract WinSparkle (zip)
+# --- WinSparkle (zip) -> runtimes/win-{arch}/native/ ---
 $WinSparkleArchive = Get-ChildItem -Path $LibsDir -Filter "WinSparkle*.zip" | Select-Object -First 1
 if ($WinSparkleArchive) {
     Write-Host "Extracting $($WinSparkleArchive.Name) ..."
     Expand-Archive -Path $WinSparkleArchive.FullName -DestinationPath $LibsDir -Force
 
-    $WinSparkleDir = Join-Path $LibsDir "WinSparkle"
-    New-Item -ItemType Directory -Path $WinSparkleDir -Force | Out-Null
+    $x86Dir   = Join-Path $RuntimesDir "win-x86\native"
+    $x64Dir   = Join-Path $RuntimesDir "win-x64\native"
+    $arm64Dir = Join-Path $RuntimesDir "win-arm64\native"
 
-    # Move architecture-specific DLLs
+    New-Item -ItemType Directory -Path $x86Dir   -Force | Out-Null
+    New-Item -ItemType Directory -Path $x64Dir   -Force | Out-Null
+    New-Item -ItemType Directory -Path $arm64Dir -Force | Out-Null
+
+    # x86 — Release\WinSparkle.dll (no x64/ARM64 in path)
     $x86Dll = Get-ChildItem -Path $LibsDir -Recurse -Filter "WinSparkle.dll" |
-        Where-Object { $_.FullName -match "\\\\Release\\\\WinSparkle\.dll$" -or $_.FullName -match "[/\\]Release[/\\]WinSparkle\.dll$" } |
-        Where-Object { $_.FullName -notmatch "x64" -and $_.FullName -notmatch "ARM64" } | Select-Object -First 1
+        Where-Object { $_.FullName -match "[/\\]Release[/\\]WinSparkle\.dll$" } |
+        Where-Object { $_.FullName -notmatch "x64" -and $_.FullName -notmatch "ARM64" } |
+        Select-Object -First 1
     if ($x86Dll) {
-        Move-Item $x86Dll.FullName (Join-Path $WinSparkleDir "WinSparkle.x86.dll") -Force
+        Move-Item $x86Dll.FullName (Join-Path $x86Dir "WinSparkle.dll") -Force
+        Write-Host "  -> runtimes/win-x86/native/WinSparkle.dll"
     }
 
+    # x64 — x64\Release\WinSparkle.dll
     $x64Dll = Get-ChildItem -Path $LibsDir -Recurse -Filter "WinSparkle.dll" |
-        Where-Object { $_.FullName -match "x64[/\\]Release" } | Select-Object -First 1
+        Where-Object { $_.FullName -match "x64[/\\]Release" } |
+        Select-Object -First 1
     if ($x64Dll) {
-        Move-Item $x64Dll.FullName (Join-Path $WinSparkleDir "WinSparkle.x86_64.dll") -Force
+        Move-Item $x64Dll.FullName (Join-Path $x64Dir "WinSparkle.dll") -Force
+        Write-Host "  -> runtimes/win-x64/native/WinSparkle.dll"
     }
 
+    # arm64 — ARM64\Release\WinSparkle.dll
     $arm64Dll = Get-ChildItem -Path $LibsDir -Recurse -Filter "WinSparkle.dll" |
-        Where-Object { $_.FullName -match "ARM64[/\\]Release" } | Select-Object -First 1
+        Where-Object { $_.FullName -match "ARM64[/\\]Release" } |
+        Select-Object -First 1
     if ($arm64Dll) {
-        Move-Item $arm64Dll.FullName (Join-Path $WinSparkleDir "WinSparkle.arm64.dll") -Force
+        Move-Item $arm64Dll.FullName (Join-Path $arm64Dir "WinSparkle.dll") -Force
+        Write-Host "  -> runtimes/win-arm64/native/WinSparkle.dll"
     }
 
     Remove-Item $WinSparkleArchive.FullName
