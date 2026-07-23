@@ -47,6 +47,7 @@ public class UpSparkleUpdater : IUpSparkle
 
     private static IUpSparklePlatformImplementation CreateImplementation()
     {
+        return new WindowsUpSparkleImplementation();
         return new MacUpSparkleImplementation();
 #if UPSPARKLE_WINDOWS
         return new WindowsUpSparkleImplementation();
