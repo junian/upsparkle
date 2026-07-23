@@ -12,15 +12,15 @@ echo "Download finished."
 echo "Extracting files ..."
 
 mkdir -p libs/Sparkle
-tar -jxvf libs/Sparkle*.tar.bz2 -C libs/Sparkle
-rm libs/Sparkle*.tar.bz2
+tar -jxvf libs/Sparkle*.tar.xz -C libs/Sparkle
+rm libs/Sparkle*.tar.xz
 
 echo "Download and extract WinSparkle"
 
 unzip -o libs/WinSparkle*.zip -d libs
 
 mkdir -p libs/WinSparkle
-mv libs/WinSparkle-*/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86.dll
+# mv libs/WinSparkle-*/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86.dll
 mv libs/WinSparkle-*/x64/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86_64.dll
 mv libs/WinSparkle-*/ARM64/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.arm64.dll
 
