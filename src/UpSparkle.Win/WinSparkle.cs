@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace UpSparkle.Win;
 
-public class WinSparkle: IDisposable
+public class WinSparkle: IUpSparkle
 {
     #region WinSparkle.dll
     
