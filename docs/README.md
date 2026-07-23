@@ -3,12 +3,9 @@ Status: **WORK IN PROGRESS**
 [![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 [![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 
-[![NuGet](https://img.shields.io/nuget/v/Upsparkle.Mac.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle.Mac/)
-[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.Mac.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle.Mac/)
-
 ## About
 
-Cross-platform updater for .NET and Xamarin. This library brings the latest platform-specific self-updating framework to Xamarin Mac / .NET Windows applications via a custom native implementation. This is made possible by two native libraries:
+Cross-platform updater for .NET desktop apps. This library ships as a single NuGet package and uses platform-specific native implementations under the hood:
 
 - On Windows, via wrapping [Winsparkle](https://winsparkle.org).
 - On macOS, via wrapping [Sparkle](https://sparkle-project.org).

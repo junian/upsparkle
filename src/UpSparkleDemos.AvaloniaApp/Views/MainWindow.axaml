@@ -10,11 +10,13 @@
         Title="UpSparkleDemos.AvaloniaApp">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding Status}" HorizontalAlignment="Center"/>
+        <Button Content="Check for updates" Command="{Binding CheckForUpdatesCommand}" HorizontalAlignment="Center"/>
+    </StackPanel>
 
 </Window>

@@ -3,21 +3,21 @@ using System.Runtime.InteropServices;
 
 namespace UpSparkle;
 
-public sealed class MacSparkle : IUpSparkle
+internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementation
 {
     private const string LibObjc = "/usr/lib/libobjc.A.dylib";
     private static readonly string[] SparkleLibraryPaths =
     [
-        Path.Combine(AppContext.BaseDirectory, "Sparkle.framework", "Sparkle"),
+        Path.Combine(AppContext.BaseDirectory, "libs", "Sparkle.framework", "Sparkle"),
         Path.Combine(AppContext.BaseDirectory, "runtimes", "osx", "native", "Sparkle.framework", "Sparkle"),
         Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, "Sparkle.framework", "Sparkle")
     ];
 
     private static readonly IntPtr SparkleLibraryHandle = LoadSparkleLibrary();
 
-    static MacSparkle()
+    static MacUpSparkleImplementation()
     {
-        NativeLibrary.SetDllImportResolver(typeof(MacSparkle).Assembly, ResolveLibrary);
+        NativeLibrary.SetDllImportResolver(typeof(MacUpSparkleImplementation).Assembly, ResolveLibrary);
     }
 
     [DllImport(LibObjc, EntryPoint = "objc_getClass", CharSet = CharSet.Ansi)]
@@ -45,6 +45,8 @@ public sealed class MacSparkle : IUpSparkle
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
     [return: MarshalAs(UnmanagedType.I1)]
     private static extern bool ObjcMsgSendBool(IntPtr receiver, IntPtr selector, IntPtr argument);
+
+    private IntPtr updater;
 
     private static IntPtr ResolveLibrary(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
@@ -124,29 +126,8 @@ public sealed class MacSparkle : IUpSparkle
         return nsUrl;
     }
 
-    private IntPtr updater;
-
-    public bool IsInitialized { get; private set; }
-    public string? AppCastUrl { get; private set; }
-    public string? PublicKey { get; private set; }
-    public string? CompanyName { get; private set; }
-    public string? AppName { get; private set; }
-    public string? AppVersion { get; private set; }
-
     public void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(appCastUrl);
-        ArgumentException.ThrowIfNullOrWhiteSpace(publicKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(companyName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(appName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(appVersion);
-
-        AppCastUrl = appCastUrl;
-        PublicKey = publicKey;
-        CompanyName = companyName;
-        AppName = appName;
-        AppVersion = appVersion;
-
         var bundle = CreateMainBundle();
         updater = Send(Class("SUUpdater"), "updaterForBundle:", bundle);
 
@@ -155,15 +136,14 @@ public sealed class MacSparkle : IUpSparkle
             throw new InvalidOperationException("Sparkle updater could not be created.");
         }
 
-        SendVoid(updater, "setFeedURL:", CreateUrl(AppCastUrl));
-        IsInitialized = true;
+        SendVoid(updater, "setFeedURL:", CreateUrl(appCastUrl));
     }
 
     public void CheckUpdateWithUI()
     {
-        if (!IsInitialized || updater == IntPtr.Zero)
+        if (updater == IntPtr.Zero)
         {
-            throw new InvalidOperationException($"{nameof(MacSparkle)} is not initialized");
+            throw new InvalidOperationException("Sparkle updater is not initialized.");
         }
 
         Send(updater, "checkForUpdates:", IntPtr.Zero);
@@ -172,6 +152,5 @@ public sealed class MacSparkle : IUpSparkle
     public void Dispose()
     {
         updater = IntPtr.Zero;
-        IsInitialized = false;
     }
 }

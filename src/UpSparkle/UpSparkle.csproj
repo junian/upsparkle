@@ -1,9 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net10.0;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>Upsparkle</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>junian</Authors>
+    <Description>Cross-platform updater for .NET desktop apps.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\libs\Sparkle\Sparkle.framework\**\*"
+          Pack="true"
+          PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
+          <Link>libs/Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\libs\WinSparkle\WinSparkle.x86_64.dll" Pack="true" PackagePath="runtimes/win-x64/native/WinSparkle.dll">
+      <Link>libs\WinSparkle.x86_64.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\libs\WinSparkle\WinSparkle.arm64.dll" Pack="true" PackagePath="runtimes/win-arm64/native/WinSparkle.dll">
+      <Link>libs\WinSparkle.arm64.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
