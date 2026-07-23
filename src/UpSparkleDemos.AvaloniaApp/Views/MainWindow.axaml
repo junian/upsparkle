@@ -14,8 +14,21 @@
     </Design.DataContext>
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding Status}" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold"/>
+
+        <!-- Assembly info (populated after first Init) -->
+        <Grid ColumnDefinitions="Auto,12,*" RowDefinitions="Auto,Auto,Auto" HorizontalAlignment="Center">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Company:"    Foreground="Gray"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CompanyName}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="App:"        Foreground="Gray"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding AppName}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Version:"    Foreground="Gray"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding AppVersion}"/>
+        </Grid>
+
+        <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" Foreground="Gray" FontStyle="Italic"/>
         <Button Content="Check for updates" Command="{Binding CheckForUpdatesCommand}" HorizontalAlignment="Center"/>
     </StackPanel>
 

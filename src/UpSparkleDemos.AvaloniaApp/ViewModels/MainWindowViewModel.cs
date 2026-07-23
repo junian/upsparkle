@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UpSparkle;
@@ -14,6 +15,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private string status = "Library is loaded.";
+
+    [ObservableProperty]
+    private string companyName = "-";
+
+    [ObservableProperty]
+    private string appName = "-";
+
+    [ObservableProperty]
+    private string appVersion = "-";
 
     public IRelayCommand CheckForUpdatesCommand { get; }
 
@@ -31,9 +41,11 @@ public partial class MainWindowViewModel : ViewModelBase
                 sparkle.Init(
                     "https://sparkle-project.org/files/sparkletestcast.xml",
                     "replace-with-public-key",
-                    "UpSparkleDemos",
-                    "UpSparkleDemos.AvaloniaApp",
-                    "0.0.1");
+                    Assembly.GetExecutingAssembly());
+
+                CompanyName = sparkle.CompanyName ?? "-";
+                AppName     = sparkle.AppName     ?? "-";
+                AppVersion  = sparkle.AppVersion  ?? "-";
             }
 
             sparkle.CheckUpdateWithUI();

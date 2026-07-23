@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <Company>UpSparkle</Company>
+    <Product>UpSparkle Avalonia Demo</Product>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
