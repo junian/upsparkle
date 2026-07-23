@@ -12,4 +12,16 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\libs\Sparkle\Sparkle.framework\**\*"
+          Link="libs/Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopySparkleFramework" AfterTargets="Build" Condition="'$(OS)' == 'Unix'">
+    <Exec Command='cp -R &quot;$(MSBuildProjectDirectory)/../../libs/Sparkle/Sparkle.framework&quot; &quot;$(TargetDir)&quot;' />
+  </Target>
+
 </Project>
