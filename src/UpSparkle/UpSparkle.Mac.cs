@@ -6,13 +6,14 @@ namespace UpSparkle;
 internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementation
 {
     private const string LibObjc = "/usr/lib/libobjc.A.dylib";
+
     private static readonly string[] SparkleLibraryPaths =
     [
-        Path.Combine(AppContext.BaseDirectory, "libs", "Sparkle.framework", "Sparkle"),
         Path.Combine(AppContext.BaseDirectory, "runtimes", "osx", "native", "Sparkle.framework", "Sparkle"),
-        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, "Sparkle.framework", "Sparkle")
+        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, "Sparkle.framework", "Sparkle"),
     ];
 
+    // Eagerly load Sparkle so its classes are registered with the ObjC runtime before we call objc_getClass.
     private static readonly IntPtr SparkleLibraryHandle = LoadSparkleLibrary();
 
     static MacUpSparkleImplementation()
@@ -20,47 +21,68 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
         NativeLibrary.SetDllImportResolver(typeof(MacUpSparkleImplementation).Assembly, ResolveLibrary);
     }
 
+    // -------------------------------------------------------------------------
+    // libobjc P/Invokes
+    // -------------------------------------------------------------------------
+
     [DllImport(LibObjc, EntryPoint = "objc_getClass", CharSet = CharSet.Ansi)]
     private static extern IntPtr ObjcGetClass(string name);
 
     [DllImport(LibObjc, EntryPoint = "sel_registerName", CharSet = CharSet.Ansi)]
-    private static extern IntPtr SelRegisterName(string selectorName);
+    private static extern IntPtr SelRegisterName(string name);
 
+    // objc_msgSend variants — each distinct call-site signature needs its own import.
+
+    // alloc / init (no args, returns id)
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
     private static extern IntPtr ObjcMsgSend(IntPtr receiver, IntPtr selector);
 
+    // initWithStartingUpdater:updaterDelegate:userDriverDelegate: (bool, id, id) -> id
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
-    private static extern IntPtr ObjcMsgSend(IntPtr receiver, IntPtr selector, IntPtr argument);
+    private static extern IntPtr ObjcMsgSendInit(
+        IntPtr receiver, IntPtr selector,
+        [MarshalAs(UnmanagedType.I1)] bool startingUpdater,
+        IntPtr updaterDelegate,
+        IntPtr userDriverDelegate);
 
+    // setFeedURL: (NSURL*) -> void
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
-    private static extern IntPtr ObjcMsgSend(IntPtr receiver, IntPtr selector, [MarshalAs(UnmanagedType.LPUTF8Str)] string argument);
+    private static extern void ObjcMsgSendSetUrl(IntPtr receiver, IntPtr selector, IntPtr url);
 
+    // checkForUpdates: (id sender) -> void
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
-    private static extern void ObjcMsgSendVoid(IntPtr receiver, IntPtr selector, IntPtr argument);
+    private static extern void ObjcMsgSendCheckForUpdates(IntPtr receiver, IntPtr selector, IntPtr sender);
 
+    // URLWithString: (NSString*) -> id
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
-    [return: MarshalAs(UnmanagedType.I1)]
-    private static extern bool ObjcMsgSendBool(IntPtr receiver, IntPtr selector);
+    private static extern IntPtr ObjcMsgSendWithArg(IntPtr receiver, IntPtr selector, IntPtr arg);
 
+    // stringWithUTF8String: (const char*) -> id
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
-    [return: MarshalAs(UnmanagedType.I1)]
-    private static extern bool ObjcMsgSendBool(IntPtr receiver, IntPtr selector, IntPtr argument);
+    private static extern IntPtr ObjcMsgSendWithStr(IntPtr receiver, IntPtr selector, [MarshalAs(UnmanagedType.LPUTF8Str)] string str);
 
-    private IntPtr updater;
+    // -------------------------------------------------------------------------
+    // State
+    // -------------------------------------------------------------------------
+
+    // The SPUStandardUpdaterController instance. We hold a strong ref via
+    // CFRetain so ARC (if any) does not collect it between calls.
+    private IntPtr updaterController = IntPtr.Zero;
+
+    // -------------------------------------------------------------------------
+    // Library loading
+    // -------------------------------------------------------------------------
 
     private static IntPtr ResolveLibrary(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
+        // We only handle Sparkle here; everything else falls through to the default resolver.
         if (!string.Equals(libraryName, "Sparkle", StringComparison.Ordinal))
-        {
             return IntPtr.Zero;
-        }
 
         foreach (var candidate in SparkleLibraryPaths.Where(File.Exists))
         {
             if (NativeLibrary.TryLoad(candidate, out var handle))
-            {
                 return handle;
-            }
         }
 
         return IntPtr.Zero;
@@ -71,86 +93,102 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
         foreach (var candidate in SparkleLibraryPaths.Where(File.Exists))
         {
             if (NativeLibrary.TryLoad(candidate, out var handle))
-            {
                 return handle;
-            }
         }
 
-        throw new DllNotFoundException("Unable to locate Sparkle.framework.");
+        throw new DllNotFoundException(
+            $"Unable to locate Sparkle.framework. Searched:{Environment.NewLine}" +
+            string.Join(Environment.NewLine, SparkleLibraryPaths));
     }
 
-    private static IntPtr Class(string name) => ObjcGetClass(name);
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
 
-    private static IntPtr Selector(string name) => SelRegisterName(name);
+    private static IntPtr Sel(string name) => SelRegisterName(name);
 
-    private static IntPtr Send(IntPtr receiver, string selector) => ObjcMsgSend(receiver, Selector(selector));
-
-    private static IntPtr Send(IntPtr receiver, string selector, IntPtr argument) =>
-        ObjcMsgSend(receiver, Selector(selector), argument);
-
-    private static IntPtr Send(IntPtr receiver, string selector, string argument) =>
-        ObjcMsgSend(receiver, Selector(selector), argument);
-
-    private static void SendVoid(IntPtr receiver, string selector, IntPtr argument) =>
-        ObjcMsgSendVoid(receiver, Selector(selector), argument);
-
-    private static bool SendBool(IntPtr receiver, string selector) =>
-        ObjcMsgSendBool(receiver, Selector(selector));
-
-    private static bool SendBool(IntPtr receiver, string selector, IntPtr argument) =>
-        ObjcMsgSendBool(receiver, Selector(selector), argument);
-
-    private static IntPtr CreateMainBundle()
+    private static IntPtr MakeNSString(string value)
     {
-        var nsBundleClass = Class("NSBundle");
-        return Send(nsBundleClass, "mainBundle");
+        var cls = ObjcGetClass("NSString");
+        return ObjcMsgSendWithStr(cls, Sel("stringWithUTF8String:"), value);
     }
 
-    private static IntPtr CreateString(string value)
+    private static IntPtr MakeNSURL(string url)
     {
-        var nsStringClass = Class("NSString");
-        return Send(nsStringClass, "stringWithUTF8String:", value);
-    }
-
-    private static IntPtr CreateUrl(string value)
-    {
-        var nsUrlClass = Class("NSURL");
-        var nsString = CreateString(value);
-        var nsUrl = Send(nsUrlClass, "URLWithString:", nsString);
-
+        var nsString = MakeNSString(url);
+        var cls = ObjcGetClass("NSURL");
+        var nsUrl = ObjcMsgSendWithArg(cls, Sel("URLWithString:"), nsString);
         if (nsUrl == IntPtr.Zero)
-        {
-            throw new ArgumentException("The app cast URL is not a valid URL.", nameof(value));
-        }
-
+            throw new ArgumentException($"'{url}' is not a valid URL.", nameof(url));
         return nsUrl;
     }
 
+    [DllImport("/usr/lib/libSystem.B.dylib", EntryPoint = "CFRetain")]
+    private static extern IntPtr CFRetain(IntPtr cf);
+
+    [DllImport("/usr/lib/libSystem.B.dylib", EntryPoint = "CFRelease")]
+    private static extern void CFRelease(IntPtr cf);
+
+    // -------------------------------------------------------------------------
+    // IUpSparklePlatformImplementation
+    // -------------------------------------------------------------------------
+
     public void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
     {
-        var bundle = CreateMainBundle();
-        updater = Send(Class("SUUpdater"), "updaterForBundle:", bundle);
+        // Allocate + init SPUStandardUpdaterController programmatically.
+        // Equivalent ObjC:
+        //   SPUStandardUpdaterController *ctrl =
+        //       [[SPUStandardUpdaterController alloc]
+        //            initWithStartingUpdater:YES
+        //                   updaterDelegate:nil
+        //               userDriverDelegate:nil];
+        var cls  = ObjcGetClass("SPUStandardUpdaterController");
+        if (cls == IntPtr.Zero)
+            throw new InvalidOperationException(
+                "SPUStandardUpdaterController class not found. " +
+                "Ensure Sparkle.framework is loaded and is version 2.x.");
 
+        var alloc = ObjcMsgSend(cls, Sel("alloc"));
+        if (alloc == IntPtr.Zero)
+            throw new InvalidOperationException("Failed to allocate SPUStandardUpdaterController.");
+
+        var ctrl = ObjcMsgSendInit(
+            alloc,
+            Sel("initWithStartingUpdater:updaterDelegate:userDriverDelegate:"),
+            startingUpdater: true,
+            updaterDelegate: IntPtr.Zero,
+            userDriverDelegate: IntPtr.Zero);
+
+        if (ctrl == IntPtr.Zero)
+            throw new InvalidOperationException("Failed to initialize SPUStandardUpdaterController.");
+
+        // Retain so the object survives across managed/unmanaged boundary.
+        updaterController = CFRetain(ctrl);
+
+        // Get the SPUUpdater from the controller and set the feed URL.
+        // Equivalent ObjC: [ctrl.updater setFeedURL:[NSURL URLWithString:appCastUrl]];
+        var updater = ObjcMsgSend(updaterController, Sel("updater"));
         if (updater == IntPtr.Zero)
-        {
-            throw new InvalidOperationException("Sparkle updater could not be created.");
-        }
+            throw new InvalidOperationException("SPUUpdater could not be retrieved from controller.");
 
-        SendVoid(updater, "setFeedURL:", CreateUrl(appCastUrl));
+        ObjcMsgSendSetUrl(updater, Sel("setFeedURL:"), MakeNSURL(appCastUrl));
     }
 
     public void CheckUpdateWithUI()
     {
-        if (updater == IntPtr.Zero)
-        {
+        if (updaterController == IntPtr.Zero)
             throw new InvalidOperationException("Sparkle updater is not initialized.");
-        }
 
-        Send(updater, "checkForUpdates:", IntPtr.Zero);
+        // -[SPUStandardUpdaterController checkForUpdates:(id)sender]
+        ObjcMsgSendCheckForUpdates(updaterController, Sel("checkForUpdates:"), IntPtr.Zero);
     }
 
     public void Dispose()
     {
-        updater = IntPtr.Zero;
+        if (updaterController != IntPtr.Zero)
+        {
+            CFRelease(updaterController);
+            updaterController = IntPtr.Zero;
+        }
     }
 }
