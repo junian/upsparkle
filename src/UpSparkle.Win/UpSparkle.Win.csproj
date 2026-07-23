@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinSparkle" Version="0.9.4" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\UpSparkle\IUpSparkle.cs">
       <Link>IUpSparkle.cs</Link>
     </Compile>
