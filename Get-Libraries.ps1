@@ -1,6 +1,10 @@
 # Get-Libraries.ps1
 # Downloads and extracts libraries listed in .gitbinmodules
 
+param(
+    [switch]$IncludeSparkle = $false
+)
+
 $LibsDir      = Join-Path $PSScriptRoot "libs"
 $RuntimesDir  = Join-Path $PSScriptRoot "runtimes"
 
@@ -16,6 +20,10 @@ if (Test-Path $LibsDir) {
 $ModulesFile = Join-Path $PSScriptRoot ".gitbinmodules"
 $Urls = Get-Content $ModulesFile | Where-Object { $_.Trim() -ne "" }
 
+if (-not $IncludeSparkle) {
+    $Urls = $Urls | Where-Object { $_ -notmatch "Sparkle" }
+}
+
 Write-Host "Downloading files ..."
 
 foreach ($Url in $Urls) {
@@ -29,13 +37,15 @@ Write-Host "Download finished."
 Write-Host "Extracting files ..."
 
 # --- Sparkle (tar.xz) -> runtimes/osx/native/ ---
-$SparkleArchive = Get-ChildItem -Path $LibsDir -Filter "Sparkle*.tar.xz" | Select-Object -First 1
-if ($SparkleArchive) {
-    $OsxNativeDir = Join-Path $RuntimesDir "osx\native"
-    New-Item -ItemType Directory -Path $OsxNativeDir -Force | Out-Null
-    Write-Host "Extracting $($SparkleArchive.Name) -> runtimes/osx/native/ ..."
-    tar -xJf $SparkleArchive.FullName -C $OsxNativeDir
-    Remove-Item $SparkleArchive.FullName
+if ($IncludeSparkle) {
+    $SparkleArchive = Get-ChildItem -Path $LibsDir -Filter "Sparkle*.tar.xz" | Select-Object -First 1
+    if ($SparkleArchive) {
+        $OsxNativeDir = Join-Path $RuntimesDir "osx\native"
+        New-Item -ItemType Directory -Path $OsxNativeDir -Force | Out-Null
+        Write-Host "Extracting $($SparkleArchive.Name) -> runtimes/osx/native/ ..."
+        tar -xJf $SparkleArchive.FullName -C $OsxNativeDir
+        Remove-Item $SparkleArchive.FullName
+    }
 }
 
 # --- WinSparkle (zip) -> runtimes/win-{arch}/native/ ---
