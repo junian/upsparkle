@@ -53,6 +53,10 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
     private static extern void ObjcMsgSendCheckForUpdates(IntPtr receiver, IntPtr selector, IntPtr sender);
 
+    // startUpdater: (NSError**) -> BOOL
+    [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
+    private static extern bool ObjcMsgSendStartUpdater(IntPtr receiver, IntPtr selector, IntPtr errorPtr);
+
     // URLWithString: (NSString*) -> id
     [DllImport(LibObjc, EntryPoint = "objc_msgSend")]
     private static extern IntPtr ObjcMsgSendWithArg(IntPtr receiver, IntPtr selector, IntPtr arg);
@@ -155,7 +159,7 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
         var ctrl = ObjcMsgSendInit(
             alloc,
             Sel("initWithStartingUpdater:updaterDelegate:userDriverDelegate:"),
-            startingUpdater: true,
+            startingUpdater: false,  // defer start so we can set feedURL first
             updaterDelegate: IntPtr.Zero,
             userDriverDelegate: IntPtr.Zero);
 
@@ -165,13 +169,22 @@ internal sealed class MacUpSparkleImplementation : IUpSparklePlatformImplementat
         // Retain so the object survives across managed/unmanaged boundary.
         updaterController = ObjcRetain(ctrl);
 
-        // Get the SPUUpdater from the controller and set the feed URL.
-        // Equivalent ObjC: [ctrl.updater setFeedURL:[NSURL URLWithString:appCastUrl]];
+        // Set the feed URL on SPUUpdater before starting, so Sparkle picks it up
+        // during its initial validation pass.
         var updater = ObjcMsgSend(updaterController, Sel("updater"));
         if (updater == IntPtr.Zero)
             throw new InvalidOperationException("SPUUpdater could not be retrieved from controller.");
 
         ObjcMsgSendSetUrl(updater, Sel("setFeedURL:"), MakeNSURL(appCastUrl));
+
+        // Now start the updater. -[SPUUpdater startUpdater:] returns NO and
+        // populates an NSError on misconfiguration.
+        var started = ObjcMsgSendStartUpdater(updater, Sel("startUpdater:"), IntPtr.Zero);
+        if (!started)
+            throw new InvalidOperationException(
+                "SPUUpdater failed to start. Check that Info.plist contains " +
+                "CFBundleIdentifier, CFBundleShortVersionString, CFBundleVersion, " +
+                "SUFeedURL, and SUPublicEDKey.");
     }
 
     public void CheckUpdateWithUI()

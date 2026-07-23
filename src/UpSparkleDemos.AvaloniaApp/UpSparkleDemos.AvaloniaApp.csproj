@@ -10,6 +10,11 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
 
+  <!-- macOS: use our Info.plist so Sparkle can read bundle metadata -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <CFBundleIdentifier>com.upsparkle.avalonia-demo</CFBundleIdentifier>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
