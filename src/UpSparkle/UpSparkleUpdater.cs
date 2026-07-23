@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace UpSparkle;
 
 public class UpSparkleUpdater : IUpSparkle
@@ -10,6 +12,31 @@ public class UpSparkleUpdater : IUpSparkle
     public string? CompanyName { get; private set; }
     public string? AppName { get; private set; }
     public string? AppVersion { get; private set; }
+
+    public virtual void Init(string appCastUrl, string publicKey, Assembly assemblyInfo)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(appCastUrl);
+        ArgumentException.ThrowIfNullOrWhiteSpace(publicKey);
+        ArgumentNullException.ThrowIfNull(assemblyInfo);
+
+        var companyName = assemblyInfo.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company
+            ?? throw new ArgumentException("Assembly is missing AssemblyCompanyAttribute.", nameof(assemblyInfo));
+
+        var appName = assemblyInfo.GetCustomAttribute<AssemblyProductAttribute>()?.Product
+            ?? assemblyInfo.GetName().Name
+            ?? throw new ArgumentException("Assembly has no product name or assembly name.", nameof(assemblyInfo));
+
+        var appVersion = assemblyInfo.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? assemblyInfo.GetName().Version?.ToString()
+            ?? throw new ArgumentException("Assembly has no version information.", nameof(assemblyInfo));
+
+        // Strip any build metadata suffix (e.g. "1.0.0+abc123" -> "1.0.0")
+        var plusIndex = appVersion.IndexOf('+');
+        if (plusIndex >= 0)
+            appVersion = appVersion[..plusIndex];
+
+        Init(appCastUrl, publicKey, companyName, appName, appVersion);
+    }
 
     public virtual void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
     {
@@ -47,13 +74,6 @@ public class UpSparkleUpdater : IUpSparkle
 
     private static IUpSparklePlatformImplementation CreateImplementation()
     {
-        return new WindowsUpSparkleImplementation();
-        return new MacUpSparkleImplementation();
-#if UPSPARKLE_WINDOWS
-        return new WindowsUpSparkleImplementation();
-#elif UPSPARKLE_MACOS
-        return new MacUpSparkleImplementation();
-#elif UPSPARKLE_GENERIC
         if (OperatingSystem.IsWindows())
         {
             return new WindowsUpSparkleImplementation();
@@ -65,9 +85,6 @@ public class UpSparkleUpdater : IUpSparkle
         }
 
         throw new PlatformNotSupportedException("UpSparkle is only supported on Windows and macOS.");
-#else
-        throw new PlatformNotSupportedException("UpSparkle is only supported on Windows and macOS.");
-#endif
     }
 }
 
