@@ -23,9 +23,35 @@ internal sealed class WindowsUpSparkleImplementation : IUpSparklePlatformImpleme
                 };
 
                 var baseDir = AppContext.BaseDirectory;
-                var dllPath = Path.Combine(baseDir, "libs", $"WinSparkle.{arch}.dll");
+                var assemblyDir = Path.GetDirectoryName(assembly.Location) ?? baseDir;
 
-                return NativeLibrary.Load(dllPath, assembly, searchPath);
+                // Probe candidate paths in priority order:
+                //   1. NuGet package layout: runtimes/win-{rid}/native/ resolves to plain
+                //      WinSparkle.dll next to the app (standard .NET NuGet native resolution).
+                //   2. Local dev layout: libs/WinSparkle.{arch}.dll under the app base dir.
+                //   3. Assembly directory (self-contained publish, single-file scenarios).
+                var candidates = new[]
+                {
+                    // NuGet / publish output — plain name, no arch suffix
+                    Path.Combine(baseDir, $"{LibName}.dll"),
+                    // Local dev build — arch-suffixed under libs/
+                    Path.Combine(baseDir, "libs", $"{LibName}.{arch}.dll"),
+                    // Alongside the managed assembly itself
+                    Path.Combine(assemblyDir, $"{LibName}.dll"),
+                    Path.Combine(assemblyDir, "libs", $"{LibName}.{arch}.dll"),
+                };
+
+                foreach (var candidate in candidates)
+                {
+                    if (File.Exists(candidate) &&
+                        NativeLibrary.TryLoad(candidate, out var handle))
+                    {
+                        return handle;
+                    }
+                }
+
+                // Fall back to the default OS resolver (PATH, etc.)
+                return IntPtr.Zero;
             });
     }
 

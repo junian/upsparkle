@@ -20,7 +20,7 @@ echo "Download and extract WinSparkle"
 unzip -o libs/WinSparkle*.zip -d libs
 
 mkdir -p libs/WinSparkle
-# mv libs/WinSparkle-*/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86.dll
+mv libs/WinSparkle-*/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86.dll
 mv libs/WinSparkle-*/x64/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.x86_64.dll
 mv libs/WinSparkle-*/ARM64/Release/WinSparkle.dll libs/WinSparkle/WinSparkle.arm64.dll
 

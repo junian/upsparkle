@@ -21,11 +21,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\libs\WinSparkle\WinSparkle.x86_64.dll" Pack="true" PackagePath="runtimes/win-x64/native/WinSparkle.dll">
+    <None Include="..\..\libs\WinSparkle\WinSparkle.x86_64.dll"
+          Pack="true"
+          PackagePath="runtimes/win-x64/native/WinSparkle.dll">
       <Link>libs\WinSparkle.x86_64.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\libs\WinSparkle\WinSparkle.arm64.dll" Pack="true" PackagePath="runtimes/win-arm64/native/WinSparkle.dll">
+    <None Include="..\..\libs\WinSparkle\WinSparkle.arm64.dll"
+          Pack="true"
+          PackagePath="runtimes/win-arm64/native/WinSparkle.dll">
       <Link>libs\WinSparkle.arm64.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

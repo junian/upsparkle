@@ -47,6 +47,13 @@ if ($WinSparkleArchive) {
     New-Item -ItemType Directory -Path $WinSparkleDir -Force | Out-Null
 
     # Move architecture-specific DLLs
+    $x86Dll = Get-ChildItem -Path $LibsDir -Recurse -Filter "WinSparkle.dll" |
+        Where-Object { $_.FullName -match "\\\\Release\\\\WinSparkle\.dll$" -or $_.FullName -match "[/\\]Release[/\\]WinSparkle\.dll$" } |
+        Where-Object { $_.FullName -notmatch "x64" -and $_.FullName -notmatch "ARM64" } | Select-Object -First 1
+    if ($x86Dll) {
+        Move-Item $x86Dll.FullName (Join-Path $WinSparkleDir "WinSparkle.x86.dll") -Force
+    }
+
     $x64Dll = Get-ChildItem -Path $LibsDir -Recurse -Filter "WinSparkle.dll" |
         Where-Object { $_.FullName -match "x64[/\\]Release" } | Select-Object -First 1
     if ($x64Dll) {
