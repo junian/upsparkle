@@ -1,10 +1,11 @@
 using System.Reflection;
+using UpSparkle.Natives;
 
 namespace UpSparkle;
 
-public class UpSparkleUpdater : IUpSparkle
+public class UpSparkleUpdater
 {
-    private readonly IUpSparklePlatformImplementation implementation = CreateImplementation();
+    private readonly INativeSparkle _nativeSparkle = CreateImplementation();
 
     public bool IsInitialized { get; private set; }
     public string? AppCastUrl { get; private set; }
@@ -52,7 +53,7 @@ public class UpSparkleUpdater : IUpSparkle
         AppName = appName;
         AppVersion = appVersion;
 
-        implementation.Init(appCastUrl, publicKey, companyName, appName, appVersion);
+        _nativeSparkle.Init(appCastUrl, publicKey, companyName, appName, appVersion);
         IsInitialized = true;
     }
 
@@ -63,34 +64,27 @@ public class UpSparkleUpdater : IUpSparkle
             throw new InvalidOperationException($"{nameof(UpSparkle)} is not initialized");
         }
 
-        implementation.CheckUpdateWithUI();
+        _nativeSparkle.CheckUpdateWithUI();
     }
 
     public virtual void Dispose()
     {
-        implementation.Dispose();
+        _nativeSparkle.Dispose();
         IsInitialized = false;
     }
 
-    private static IUpSparklePlatformImplementation CreateImplementation()
+    private static INativeSparkle CreateImplementation()
     {
         if (OperatingSystem.IsWindows())
         {
-            return new WindowsUpSparkleImplementation();
+            return new WinSparkle();
         }
 
         if (OperatingSystem.IsMacOS())
         {
-            return new MacUpSparkleImplementation();
+            return new MacSparkle();
         }
 
         throw new PlatformNotSupportedException("UpSparkle is only supported on Windows and macOS.");
     }
-}
-
-internal interface IUpSparklePlatformImplementation
-{
-    void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion);
-    void CheckUpdateWithUI();
-    void Dispose();
 }

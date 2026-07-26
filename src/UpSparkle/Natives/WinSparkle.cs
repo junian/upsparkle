@@ -1,13 +1,13 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace UpSparkle;
+namespace UpSparkle.Natives;
 
-internal sealed class WindowsUpSparkleImplementation : IUpSparklePlatformImplementation
+internal sealed class WinSparkle: INativeSparkle
 {
     private const string LibName = "WinSparkle";
 
-    static WindowsUpSparkleImplementation()
+    static WinSparkle()
     {
         NativeLibrary.SetDllImportResolver(
             Assembly.GetExecutingAssembly(),
@@ -19,7 +19,8 @@ internal sealed class WindowsUpSparkleImplementation : IUpSparklePlatformImpleme
                 var arch = RuntimeInformation.ProcessArchitecture switch
                 {
                     Architecture.Arm64 => "arm64",
-                    _                  => "x86_64",
+                    Architecture.X86   => "x64",
+                    _                  => "x86",
                 };
 
                 var baseDir = AppContext.BaseDirectory;

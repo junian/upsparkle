@@ -17,7 +17,13 @@
           Pack="true"
           PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
       <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\runtimes\osx\native\libMacSparkle.dylib"
+          Pack="true"
+          PackagePath="runtimes/osx/native/libMacSparkle.dylib">
+      <Link>runtimes\osx\native\libMacSparkle.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
@@ -27,19 +33,19 @@
           Pack="true"
           PackagePath="runtimes/win-x86/native/WinSparkle.dll">
       <Link>runtimes\win-x86\native\WinSparkle.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\runtimes\win-x64\native\WinSparkle.dll"
           Pack="true"
           PackagePath="runtimes/win-x64/native/WinSparkle.dll">
       <Link>runtimes\win-x64\native\WinSparkle.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\runtimes\win-arm64\native\WinSparkle.dll"
           Pack="true"
           PackagePath="runtimes/win-arm64/native/WinSparkle.dll">
       <Link>runtimes\win-arm64\native\WinSparkle.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

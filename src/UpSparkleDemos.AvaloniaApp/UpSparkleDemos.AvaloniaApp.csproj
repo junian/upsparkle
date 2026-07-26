@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <OutputType Condition="!$([MSBuild]::IsOSPlatform('OSX'))">WinExe</OutputType>
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('OSX'))">net10.0</TargetFramework>
+
+    <OutputType Condition="$([MSBuild]::IsOSPlatform('OSX'))">Exe</OutputType>
+    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('OSX'))">net10.0-macos</TargetFramework>
+    
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
