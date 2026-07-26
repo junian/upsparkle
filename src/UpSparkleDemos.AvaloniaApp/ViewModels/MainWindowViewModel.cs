@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UpSparkle;
@@ -32,7 +33,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CheckForUpdatesCommand = new RelayCommand(CheckForUpdates);
     }
 
-    private void CheckForUpdates()
+    private async void CheckForUpdates()
     {
         try
         {
@@ -48,6 +49,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 AppVersion  = sparkle.AppVersion  ?? "-";
             }
 
+            await Task.Delay(2000);
             sparkle.CheckUpdateWithUI();
             Status = "Requested an update check.";
         }
