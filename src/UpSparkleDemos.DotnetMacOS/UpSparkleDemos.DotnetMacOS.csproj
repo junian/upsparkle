@@ -12,4 +12,7 @@
     -->
     <TrimMode Condition="'$(Configuration)' == 'Release'">full</TrimMode>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UpSparkle\UpSparkle.csproj" />
+  </ItemGroup>
 </Project>

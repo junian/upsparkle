@@ -1,6 +1,9 @@
 <Solution>
   <Folder Name="/Demos/">
     <Project Path="src/UpSparkleDemos.AvaloniaApp/UpSparkleDemos.AvaloniaApp.csproj" />
+    <Project Path="src/UpSparkleDemos.DotnetMacOS/UpSparkleDemos.DotnetMacOS.csproj">
+      <Deploy />
+    </Project>
   </Folder>
   <Project Path="src/UpSparkle/UpSparkle.csproj" />
 </Solution>
