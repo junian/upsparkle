@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageId>Upsparkle</PackageId>
-    <Version>1.0.0</Version>
+    <Version>0.0.1</Version>
     <Authors>junian</Authors>
     <Description>Cross-platform updater for .NET desktop apps.</Description>
   </PropertyGroup>
@@ -16,13 +16,13 @@
     <None Include="..\..\runtimes\osx\native\Sparkle.framework\**\*"
           Pack="true"
           PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
-      <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <Link>Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\runtimes\osx\native\libMacSparkle.dylib"
           Pack="true"
           PackagePath="runtimes/osx/native/libMacSparkle.dylib">
-      <Link>runtimes\osx\native\libMacSparkle.dylib</Link>
+      <Link>libMacSparkle.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
