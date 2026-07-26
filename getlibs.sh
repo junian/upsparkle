@@ -14,8 +14,15 @@ echo "Download finished."
 echo "Extracting Sparkle ..."
 
 mkdir -p "${RUNTIMES_DIR}/osx/native"
-tar -Jxf libs/Sparkle*.tar.xz -C "${RUNTIMES_DIR}/osx/native"
+tar -Jxf libs/Sparkle*.tar.xz -C "libs"
+mv libs/Sparkle.framework -C "${RUNTIMES_DIR}/osx/native/."
 rm libs/Sparkle*.tar.xz
+
+echo "Extracting MacSparkle ..."
+
+unzip -o libs/libMacSparkle*.zip -d libs
+mv libs/libMacSparkle*.dylib "${RUNTIMES_DIR}/osx/native/libMacSparkle.dylib"
+rm libs/libMacSparkle*.zip
 
 echo "Extracting WinSparkle ..."
 
