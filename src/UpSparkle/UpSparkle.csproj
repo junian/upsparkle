@@ -13,7 +13,7 @@
 
   <!-- Sparkle.framework (macOS) -->
   <ItemGroup>
-    <None Include="..\..\runtimes\osx\native\Sparkle.framework\**\*"
+    <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
           Pack="true"
           PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
       <Link>Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
