@@ -11,5 +11,6 @@
       <Deploy />
     </Project>
   </Folder>
+  <Project Path="src/UpSparkle.Tests/UpSparkle.Tests.csproj" />
   <Project Path="src/UpSparkle/UpSparkle.csproj" />
 </Solution>
