@@ -16,6 +16,47 @@ Cross-platform updater for .NET desktop apps. This library ships as a single NuG
 - On Windows, via wrapping [Winsparkle](https://winsparkle.org).
 - On macOS, via wrapping [Sparkle](https://sparkle-project.org).
 
+## Supported Platforms
+
+For macOS or Mac Catalyst:
+
+- `net6.0` or later
+- `net6.0-macos` or later
+- `net6.0-maccatalyst` or later
+
+For Windows:
+
+- `net462` (.NET Framework 4.6.2) or later
+- `net6.0` or later
+- `net6.0-windows` or later
+
+Currently, this library support for following platforms:
+
+1. macOS (Apple Silicon and Intel)
+2. Mac Catalyst (Apple Silicon and Intel)
+3. Windows 10 and 11 (Arm64, x64, and x86)
+
+Tested with following .NET projects:
+
+### Windows
+
+It works for .NET Framework 4.6.2 or later and modern .NET
+
+- WinForms
+- WPF
+- WinUI
+- AvaloniaUI
+- MAUI (WinUI)
+
+### macOS
+
+It works for modern .NET only
+
+- .NET macOS
+- MAUI (Mac Catalyst)
+- Avalonia UI
+- Uno Platform
+
 ## Development
 
 Before starting development, install 3rd party dependencies by running the appropriate script for your platform.
