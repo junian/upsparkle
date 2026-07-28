@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UpSparkleDemos.WpfDemo"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
+        <Button Content="Check Update" HorizontalAlignment="Left" Margin="87,168,0,0" VerticalAlignment="Top" Click="Button_Click"/>
 
     </Grid>
 </Window>

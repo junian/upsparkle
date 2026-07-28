@@ -25,6 +25,9 @@ namespace UpSparkleDemos.WinFormsDemo
             updater.CheckUpdateWithUI();
         }
 
-        
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            updater.Dispose();
+        }
     }
 }
