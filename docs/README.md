@@ -30,9 +30,63 @@ Or via the Package Manager Console in Visual Studio:
 Install-Package Upsparkle
 ```
 
-### 2. Initialize the updater
+### 2. Configure your project
 
-Create an `UpSparkleUpdater` instance once (typically at app startup) and call `Init` with your appcast URL, your EdDSA public key, and the app's assembly:
+The `Init` call reads your app's metadata from the executing assembly, so make sure the relevant fields are populated before calling it.
+
+#### Windows — set assembly metadata in your `.csproj`
+
+```xml
+<PropertyGroup>
+  <Company>Acme Corp</Company>
+  <Product>My App</Product>
+  <Version>1.0.0</Version>
+</PropertyGroup>
+```
+
+These map to `AssemblyCompanyAttribute`, `AssemblyProductAttribute`, and `AssemblyInformationalVersionAttribute` respectively, which UpSparkle reads at runtime.
+
+#### macOS — add Sparkle keys to your `Info.plist`
+
+On macOS, Sparkle reads its configuration directly from the app bundle's `Info.plist`. At minimum you need:
+
+```xml
+<!-- Required: where Sparkle checks for updates -->
+<key>SUFeedURL</key>
+<string>https://example.com/appcast.xml</string>
+
+<!-- Required: EdDSA public key for verifying update signatures -->
+<key>SUPublicEDKey</key>
+<string>pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=</string>
+```
+
+A few commonly used optional keys:
+
+```xml
+<!-- Skip the "can we check automatically?" permission prompt on second launch -->
+<key>SUEnableAutomaticChecks</key>
+<true/>
+
+<!-- How often to check for updates, in seconds (default: 86400 = 1 day) -->
+<key>SUScheduledCheckInterval</key>
+<integer>86400</integer>
+
+<!-- Silently download and install updates in the background (default: NO) -->
+<key>SUAutomaticallyUpdate</key>
+<false/>
+
+<!-- Hide release notes in the update alert (default: YES = shown) -->
+<key>SUShowReleaseNotes</key>
+<true/>
+```
+
+For the full list of supported keys — including security, sandboxing, and system profiling options — see the [Sparkle customization docs](https://sparkle-project.org/documentation/customization/).
+
+To generate your EdDSA key pair, use the `generate_keys` tool that ships with Sparkle. See the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) for step-by-step instructions.
+
+### 3. Initialize the updater
+
+Create an `UpSparkleUpdater` instance once (typically at app startup) and call `Init` with your appcast URL, your EdDSA public key, and the executing assembly:
 
 ```csharp
 using UpSparkle;
@@ -41,25 +95,14 @@ using UpSparkle;
 var updater = new UpSparkleUpdater();
 
 updater.Init(
-    appCastUrl: "https://example.com/appcast.xml",
-    publicKey:  "MCowBQYDK2VwAyEA<your-eddsa-public-key>",
+    appCastUrl:   "https://example.com/appcast.xml",
+    publicKey:    "<your-base64-eddsa-public-key>",
     assemblyInfo: System.Reflection.Assembly.GetExecutingAssembly());
 ```
 
-The `assemblyInfo` overload reads the company name, product name, and version directly from your assembly attributes, so you don't need to repeat them manually.
+`Init` reads the company name, product name, and version directly from the assembly attributes set in step 2, so you don't need to repeat them in code.
 
-Alternatively, pass the values explicitly:
-
-```csharp
-updater.Init(
-    appCastUrl:   "https://example.com/appcast.xml",
-    publicKey:    "MCowBQYDK2VwAyEA<your-eddsa-public-key>",
-    companyName:  "Acme Corp",
-    appName:      "My App",
-    appVersion:   "1.0.0");
-```
-
-### 3. Check for updates
+### 4. Check for updates
 
 Trigger the native update UI — for example, from a menu item or button:
 
@@ -67,7 +110,7 @@ Trigger the native update UI — for example, from a menu item or button:
 updater.CheckUpdateWithUI();
 ```
 
-### 4. Clean up on exit
+### 5. Clean up on exit
 
 Dispose the updater when the application closes to release native resources:
 
@@ -88,8 +131,8 @@ public partial class MainWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         _updater.Init(
-            appCastUrl: "https://example.com/appcast.xml",
-            publicKey:  "MCowBQYDK2VwAyEA<your-eddsa-public-key>",
+            appCastUrl:   "https://example.com/appcast.xml",
+            publicKey:    "<your-base64-eddsa-public-key>",
             assemblyInfo: System.Reflection.Assembly.GetExecutingAssembly());
     }
 
@@ -148,7 +191,7 @@ Works with modern .NET only:
 
 ## Appcast & Public Key
 
-UpSparkle requires an [appcast XML file](https://sparkle-project.org/documentation/publishing/) hosted at a public URL so the native frameworks can check for new versions. You also need to sign your updates with an EdDSA key pair — see the [Sparkle documentation](https://sparkle-project.org/documentation/eddsa-signatures/) for key generation instructions.
+UpSparkle requires an [appcast XML file](https://sparkle-project.org/documentation/publishing/) hosted at a public URL. Updates must be signed with an EdDSA key pair — use the `generate_keys` tool that ships with Sparkle and follow the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) to generate your keys and sign your releases.
 
 ## Development
 
