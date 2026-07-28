@@ -1,13 +1,13 @@
 <Solution>
   <Folder Name="/Demos/">
     <Project Path="src/Demos/UpSparkleDemos.AvaloniaApp/UpSparkleDemos.AvaloniaApp.csproj" />
-    <Project Path="src/Demos/UpSparkleDemos.DotnetMacOS/UpSparkleDemos.DotnetMacOS.csproj">
-      <Deploy />
-    </Project>
     <Project Path="src/Demos/UpSparkleDemos.MacCatalystDemo/UpSparkleDemos.MacCatalystDemo.csproj">
       <Deploy />
     </Project>
     <Project Path="src/Demos/UpSparkleDemos.MauiDemo/UpSparkleDemos.MauiDemo.csproj" />
+    <Project Path="src\Demos\UpSparkleDemos.MacOSDemo\UpSparkleDemos.MacOSDemo.csproj">
+      <Deploy />
+    </Project>
   </Folder>
   <Project Path="src/UpSparkle/UpSparkle.csproj" />
 </Solution>

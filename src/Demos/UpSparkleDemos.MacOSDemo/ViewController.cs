@@ -4,7 +4,7 @@ using Foundation;
 using ObjCRuntime;
 using UpSparkle;
 
-namespace UpSparkleDemos.DotnetMacOS;
+namespace UpSparkleDemos.MacOSDemo;
 
 public partial class ViewController : NSViewController {
 	private UpSparkleUpdater? _updater;

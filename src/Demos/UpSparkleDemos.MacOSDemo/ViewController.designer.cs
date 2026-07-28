@@ -5,7 +5,7 @@
 // Manual changes to this file may not be handled correctly.
 //
 
-namespace UpSparkleDemos.DotnetMacOS;
+namespace UpSparkleDemos.MacOSDemo;
 
 [Register ("ViewController")]
 partial class ViewController {

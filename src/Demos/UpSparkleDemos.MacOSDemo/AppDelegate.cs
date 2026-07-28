@@ -1,4 +1,4 @@
-namespace UpSparkleDemos.DotnetMacOS;
+namespace UpSparkleDemos.MacOSDemo;
 
 [Register ("AppDelegate")]
 public class AppDelegate : NSApplicationDelegate {
