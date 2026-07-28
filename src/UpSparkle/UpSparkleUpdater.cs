@@ -1,82 +1,103 @@
+using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using UpSparkle.Natives;
 
-namespace UpSparkle;
-
-public class UpSparkleUpdater
+namespace UpSparkle
 {
-    private readonly INativeSparkle _nativeSparkle = CreateImplementation();
-
-    public bool IsInitialized { get; private set; }
-    public string? AppCastUrl { get; private set; }
-    public string? PublicKey { get; private set; }
-    public string? CompanyName { get; private set; }
-    public string? AppName { get; private set; }
-    public string? AppVersion { get; private set; }
-
-    public virtual void Init(string appCastUrl, string publicKey, Assembly assemblyInfo)
+    public class UpSparkleUpdater
     {
-        ArgumentNullException.ThrowIfNull(assemblyInfo);
+        private readonly INativeSparkle nativeSparkle = CreateNativeSparkle();
 
-        var companyName = assemblyInfo.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company
-            ?? throw new ArgumentException("Assembly is missing AssemblyCompanyAttribute.", nameof(assemblyInfo));
+        public bool IsInitialized { get; private set; }
+        public string AppCastUrl { get; private set; }
+        public string PublicKey { get; private set; }
+        public string CompanyName { get; private set; }
+        public string AppName { get; private set; }
+        public string AppVersion { get; private set; }
 
-        var appName = assemblyInfo.GetCustomAttribute<AssemblyProductAttribute>()?.Product
-            ?? assemblyInfo.GetName().Name
-            ?? throw new ArgumentException("Assembly has no product name or assembly name.", nameof(assemblyInfo));
-
-        var appVersion = assemblyInfo.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-            ?? assemblyInfo.GetName().Version?.ToString()
-            ?? throw new ArgumentException("Assembly has no version information.", nameof(assemblyInfo));
-
-        // Strip any build metadata suffix (e.g. "1.0.0+abc123" -> "1.0.0")
-        var plusIndex = appVersion.IndexOf('+');
-        if (plusIndex >= 0)
-            appVersion = appVersion[..plusIndex];
-
-        Init(appCastUrl, publicKey, companyName, appName, appVersion);
-    }
-
-    public virtual void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
-    {
-        AppCastUrl = appCastUrl;
-        PublicKey = publicKey;
-        CompanyName = companyName;
-        AppName = appName;
-        AppVersion = appVersion;
-
-        _nativeSparkle.Init(appCastUrl, publicKey, companyName, appName, appVersion);
-        IsInitialized = true;
-    }
-
-    public virtual void CheckUpdateWithUI()
-    {
-        if (!IsInitialized)
+        public virtual void Init(string appCastUrl, string publicKey, Assembly assemblyInfo)
         {
-            throw new InvalidOperationException($"{nameof(UpSparkle)} is not initialized");
+            if(assemblyInfo == null)
+                throw new ArgumentNullException(nameof(assemblyInfo));
+
+            var companyName = assemblyInfo.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company
+                              ?? throw new ArgumentException("Assembly is missing AssemblyCompanyAttribute.",
+                                  nameof(assemblyInfo));
+
+            var appName = assemblyInfo.GetCustomAttribute<AssemblyProductAttribute>()?.Product
+                          ?? assemblyInfo.GetName().Name
+                          ?? throw new ArgumentException("Assembly has no product name or assembly name.",
+                              nameof(assemblyInfo));
+
+            var appVersion = assemblyInfo.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                                 ?.InformationalVersion
+                             ?? assemblyInfo.GetName().Version?.ToString()
+                             ?? throw new ArgumentException("Assembly has no version information.",
+                                 nameof(assemblyInfo));
+
+            // Strip any build metadata suffix (e.g. "1.0.0+abc123" -> "1.0.0")
+            var plusIndex = appVersion.IndexOf('+');
+            if (plusIndex >= 0)
+                appVersion = appVersion.Substring(0, plusIndex);
+
+            Init(appCastUrl, publicKey, companyName, appName, appVersion);
         }
 
-        _nativeSparkle.CheckUpdateWithUI();
-    }
-
-    public virtual void Dispose()
-    {
-        _nativeSparkle.Dispose();
-        IsInitialized = false;
-    }
-
-    private static INativeSparkle CreateImplementation()
-    {
-        if (OperatingSystem.IsWindows())
+        public virtual void Init(string appCastUrl, string publicKey, string companyName, string appName,
+            string appVersion)
         {
-            return new WinSparkle();
+            AppCastUrl = appCastUrl;
+            PublicKey = publicKey;
+            CompanyName = companyName;
+            AppName = appName;
+            AppVersion = appVersion;
+
+            nativeSparkle.Init(appCastUrl, publicKey, companyName, appName, appVersion);
+            IsInitialized = true;
         }
 
-        if (OperatingSystem.IsMacOS())
+        /// <summary>
+        /// Check Update with native UI
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public virtual void CheckUpdateWithUI()
         {
-            return new MacSparkle();
+            if (!IsInitialized)
+            {
+                throw new InvalidOperationException($"{nameof(UpSparkle)} is not initialized");
+            }
+
+            nativeSparkle.CheckUpdateWithUI();
         }
 
-        throw new PlatformNotSupportedException("UpSparkle is only supported on Windows and macOS.");
+        /// <summary>
+        /// Dispose the native object
+        /// </summary>
+        public virtual void Dispose()
+        {
+            nativeSparkle.Dispose();
+            IsInitialized = false;
+        }
+
+        /// <summary>
+        /// Create native Sparkle object based on Operating system
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="PlatformNotSupportedException"></exception>
+        private static INativeSparkle CreateNativeSparkle()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return new WinSparkle();
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return new MacSparkle();
+            }
+
+            throw new PlatformNotSupportedException("UpSparkle is only supported on Windows and macOS.");
+        }
     }
 }
