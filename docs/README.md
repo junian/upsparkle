@@ -7,7 +7,7 @@ Thin wrapper of native updater framework for .NET desktop apps. It uses Sparkle 
 [![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 [![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 
-<div>
+</div>
 
 ## About
 
