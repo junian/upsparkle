@@ -1,7 +1,7 @@
 using Avalonia.Controls;
-using UpSparkleDemos.AvaloniaApp.ViewModels;
+using UpSparkleDemos.AvaloniaDemo.ViewModels;
 
-namespace UpSparkleDemos.AvaloniaApp.Views;
+namespace UpSparkleDemos.AvaloniaDemo.Views;
 
 public partial class MainWindow : Window
 {

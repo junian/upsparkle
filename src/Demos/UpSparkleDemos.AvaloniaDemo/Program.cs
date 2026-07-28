@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace UpSparkleDemos.AvaloniaApp;
+namespace UpSparkleDemos.AvaloniaDemo;
 
 sealed class Program
 {

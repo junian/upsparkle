@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UpSparkle;
 
-namespace UpSparkleDemos.AvaloniaApp.ViewModels;
+namespace UpSparkleDemos.AvaloniaDemo.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {

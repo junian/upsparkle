@@ -4,10 +4,10 @@ using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
-using UpSparkleDemos.AvaloniaApp.ViewModels;
-using UpSparkleDemos.AvaloniaApp.Views;
+using UpSparkleDemos.AvaloniaDemo.ViewModels;
+using UpSparkleDemos.AvaloniaDemo.Views;
 
-namespace UpSparkleDemos.AvaloniaApp;
+namespace UpSparkleDemos.AvaloniaDemo;
 
 public partial class App : Application
 {

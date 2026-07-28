@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace UpSparkleDemos.AvaloniaApp.ViewModels;
+namespace UpSparkleDemos.AvaloniaDemo.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject
 {
