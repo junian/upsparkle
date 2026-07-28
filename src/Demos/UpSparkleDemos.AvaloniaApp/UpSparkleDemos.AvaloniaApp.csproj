@@ -33,6 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UpSparkle\UpSparkle.csproj" />
+    <ProjectReference Include="..\..\UpSparkle\UpSparkle.csproj" />
   </ItemGroup>
 </Project>

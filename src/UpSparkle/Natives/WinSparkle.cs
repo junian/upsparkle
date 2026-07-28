@@ -104,9 +104,7 @@ namespace UpSparkle.Natives
             //   3. Assembly directory (self-contained publish, single-file scenarios).
             var candidates = new[]
             {
-                Path.Combine(baseDir, $"{LibName}.dll"),
                 Path.Combine(baseDir, "runtimes", $"win-{arch}", "native", $"{LibName}.dll"),
-                Path.Combine(assemblyDir, $"{LibName}.dll"),
                 Path.Combine(assemblyDir, "runtimes", $"win-{arch}", "native", $"{LibName}.dll"),
             };
 

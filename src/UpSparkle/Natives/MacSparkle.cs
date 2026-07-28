@@ -87,9 +87,7 @@ namespace UpSparkle.Natives
             //   3. Assembly directory (self-contained publish, single-file scenarios).
             var candidates = new[]
             {
-                Path.Combine(baseDir, $"{LibName}.dylib"),
                 Path.Combine(baseDir, "runtimes", "osx", "native", $"{LibName}.dylib"),
-                Path.Combine(assemblyDir, $"{LibName}.dylib"),
                 Path.Combine(assemblyDir, "runtimes", "osx", "native", $"{LibName}.dylib"),
             };
 
