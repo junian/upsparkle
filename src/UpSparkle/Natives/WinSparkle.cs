@@ -5,6 +5,12 @@ using System.Runtime.InteropServices;
 
 namespace UpSparkle.Natives
 {
+    /// <summary>
+    /// Windows-specific implementation of <see cref="INativeSparkle"/> that wraps the
+    /// WinSparkle native DLL via P/Invoke. The correct architecture variant of
+    /// <c>WinSparkle.dll</c> (x86, x64, or arm64) is loaded at class initialization time
+    /// from the NuGet <c>runtimes/win-{rid}/native/</c> layout.
+    /// </summary>
     internal sealed class WinSparkle : INativeSparkle
     {
         private const string LibName = "WinSparkle";
@@ -45,6 +51,16 @@ namespace UpSparkle.Natives
         private static readonly win_sparkle_set_app_details_delegate win_sparkle_set_app_details;
         private static readonly win_sparkle_check_update_with_ui_delegate win_sparkle_check_update_with_ui;
 
+        /// <summary>
+        /// Loads <c>WinSparkle.dll</c> for the current process architecture and resolves
+        /// all required native function pointers. Runs once per app domain.
+        /// </summary>
+        /// <exception cref="DllNotFoundException">
+        /// Thrown when <c>WinSparkle.dll</c> cannot be found in any of the probed locations.
+        /// </exception>
+        /// <exception cref="EntryPointNotFoundException">
+        /// Thrown when a required exported function cannot be found in the loaded DLL.
+        /// </exception>
         static WinSparkle()
         {
             var handle = LoadNativeLibrary();
@@ -62,6 +78,17 @@ namespace UpSparkle.Natives
             win_sparkle_check_update_with_ui = GetDelegate<win_sparkle_check_update_with_ui_delegate>(handle, nameof(win_sparkle_check_update_with_ui));
         }
 
+        /// <summary>
+        /// Resolves a named exported function from a loaded native module and returns it as a
+        /// managed delegate of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The delegate type that matches the native function's signature.</typeparam>
+        /// <param name="moduleHandle">The module handle returned by <see cref="LoadLibrary"/>.</param>
+        /// <param name="procName">The name of the exported function to resolve.</param>
+        /// <returns>A delegate wrapping the native function pointer.</returns>
+        /// <exception cref="EntryPointNotFoundException">
+        /// Thrown when <paramref name="procName"/> cannot be found in the module.
+        /// </exception>
         private static T GetDelegate<T>(IntPtr moduleHandle, string procName) where T : class
         {
             var procAddress = GetProcAddress(moduleHandle, procName);
@@ -74,6 +101,15 @@ namespace UpSparkle.Natives
             return Marshal.GetDelegateForFunctionPointer<T>(procAddress);
         }
 
+        /// <summary>
+        /// Probes well-known paths for the architecture-appropriate <c>WinSparkle.dll</c> and
+        /// loads it into the current process. Falls back to the OS loader (PATH / DLL search
+        /// order) if no candidate file is found on disk.
+        /// </summary>
+        /// <returns>
+        /// A non-zero module handle on success, or <see cref="IntPtr.Zero"/> if the library
+        /// could not be loaded.
+        /// </returns>
         private static IntPtr LoadNativeLibrary()
         {
             var arch = "x86";
@@ -122,6 +158,16 @@ namespace UpSparkle.Natives
             return LoadLibrary($"{LibName}.dll");
         }
 
+        /// <summary>
+        /// Configures and starts the WinSparkle updater with the supplied application details.
+        /// Sets the appcast URL, the EdDSA public key, and the app metadata, then calls
+        /// <c>win_sparkle_init</c> to start the background update check timer.
+        /// </summary>
+        /// <param name="appCastUrl">The URL of the appcast XML feed.</param>
+        /// <param name="publicKey">The EdDSA public key (Base64-encoded) for signature verification.</param>
+        /// <param name="companyName">The name of the company or publisher.</param>
+        /// <param name="appName">The display name of the application.</param>
+        /// <param name="appVersion">The current version string of the application.</param>
         public void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
         {
             win_sparkle_set_appcast_url(appCastUrl);
@@ -130,11 +176,19 @@ namespace UpSparkle.Natives
             win_sparkle_init();
         }
 
+        /// <summary>
+        /// Triggers the WinSparkle update UI, which checks for a new version and, if one is
+        /// available, presents the user with a download and install dialog.
+        /// </summary>
         public void CheckUpdateWithUI()
         {
             win_sparkle_check_update_with_ui();
         }
 
+        /// <summary>
+        /// Shuts down the WinSparkle background thread and releases its resources by calling
+        /// <c>win_sparkle_cleanup</c>. Should be called before the application exits.
+        /// </summary>
         public void Dispose()
         {
             win_sparkle_cleanup();
