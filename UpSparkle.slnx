@@ -4,6 +4,7 @@
     <Project Path="src/Demos/UpSparkleDemos.DotnetMacOS/UpSparkleDemos.DotnetMacOS.csproj">
       <Deploy />
     </Project>
+    <Project Path="src/Demos/UpSparkleDemos.MauiDemo/UpSparkleDemos.MauiDemo.csproj" />
   </Folder>
   <Project Path="src/UpSparkle/UpSparkle.csproj" />
 </Solution>
