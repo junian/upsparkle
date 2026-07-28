@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UpSparkle.Natives;
@@ -91,8 +92,9 @@ namespace UpSparkle
             {
                 return new WinSparkle();
             }
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) 
+                || RuntimeInformation.OSDescription.StartsWith("Mac Catalyst"))
             {
                 return new MacSparkle();
             }
