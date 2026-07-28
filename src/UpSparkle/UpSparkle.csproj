@@ -16,13 +16,13 @@
     <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
           Pack="true"
           PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
-      <Link>Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\..\runtimes\osx\native\libMacSparkle.dylib"
           Pack="true"
           PackagePath="runtimes/osx/native/libMacSparkle.dylib">
-      <Link>libMacSparkle.dylib</Link>
+      <Link>runtimes\osx\native\libMacSparkle.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

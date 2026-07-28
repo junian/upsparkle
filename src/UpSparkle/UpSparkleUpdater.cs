@@ -16,8 +16,6 @@ public class UpSparkleUpdater
 
     public virtual void Init(string appCastUrl, string publicKey, Assembly assemblyInfo)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(appCastUrl);
-        ArgumentException.ThrowIfNullOrWhiteSpace(publicKey);
         ArgumentNullException.ThrowIfNull(assemblyInfo);
 
         var companyName = assemblyInfo.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company
@@ -41,12 +39,6 @@ public class UpSparkleUpdater
 
     public virtual void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(appCastUrl);
-        ArgumentException.ThrowIfNullOrWhiteSpace(publicKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(companyName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(appName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(appVersion);
-
         AppCastUrl = appCastUrl;
         PublicKey = publicKey;
         CompanyName = companyName;

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace UpSparkle.Natives;
 
-public class MacSparkle: INativeSparkle
+internal class MacSparkle: INativeSparkle
 {
     private const string LibName = "libMacSparkle";
 
@@ -58,6 +58,9 @@ public class MacSparkle: INativeSparkle
     }
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    private static extern void mac_sparkle_set_appcast_url([MarshalAs(UnmanagedType.LPStr)] string url);
+    
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     private static extern void mac_sparkle_init();
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -65,6 +68,7 @@ public class MacSparkle: INativeSparkle
     
     public void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
     {
+        mac_sparkle_set_appcast_url(appCastUrl);
         mac_sparkle_init();
     }
 

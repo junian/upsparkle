@@ -1,24 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType Condition="!$([MSBuild]::IsOSPlatform('OSX'))">WinExe</OutputType>
-    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('OSX'))">net10.0</TargetFramework>
-
-    <OutputType Condition="$([MSBuild]::IsOSPlatform('OSX'))">Exe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework Condition="$([MSBuild]::IsOSPlatform('OSX'))">net10.0-macos</TargetFramework>
-    <RuntimeIdentifiers>osx-arm64</RuntimeIdentifiers>
-    
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('OSX'))">net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <RuntimeIdentifiers>osx-arm64</RuntimeIdentifiers>
 
     <Company>UpSparkle</Company>
     <Product>UpSparkle Avalonia Demo</Product>
-    <Version>1.0.0</Version>
-  </PropertyGroup>
-
-  <!-- macOS: use our Info.plist so Sparkle can read bundle metadata -->
-  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <CFBundleIdentifier>com.upsparkle.avalonia-demo</CFBundleIdentifier>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

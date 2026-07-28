@@ -1,7 +1,13 @@
-Status: **WORK IN PROGRESS**
+<div align="center">
+
+# UpSparkle
+
+Thin wrapper of native updater framework for .NET desktop apps. It uses Sparkle for macOS and WinSparkle for Windows.
 
 [![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 [![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
+
+<div>
 
 ## About
 
@@ -33,8 +39,7 @@ To use different version of Sparkle or WinSparkle binaries, you can edit `.gitbi
 ## Credits
 
 - [sparkle-project/Sparkle](https://github.com/sparkle-project/Sparkle) for macOS Native framework.
-- [vslavik/winsparkle](https://github.com/vslavik/winsparkle) for Win32 Native implementation.
-- [rainycape/SparkleSharp](https://github.com/rainycape/SparkleSharp) for Xamarin.Mac binding starting code.
+- [vslavik/winsparkle](https://github.com/vslavik/winsparkle) for Windows Native implementation.
 
 ## License
 

@@ -33,23 +33,22 @@ public partial class MainWindowViewModel : ViewModelBase
         CheckForUpdatesCommand = new RelayCommand(CheckForUpdates);
     }
 
+    public void Init()
+    {
+        sparkle.Init(
+            "https://sparkle-project.org/files/sparkletestcast.xml",
+            "replace-with-public-key",
+            Assembly.GetExecutingAssembly());
+
+        CompanyName = sparkle.CompanyName ?? "-";
+        AppName     = sparkle.AppName     ?? "-";
+        AppVersion  = sparkle.AppVersion  ?? "-";
+    }
+
     private async void CheckForUpdates()
     {
         try
         {
-            if (!sparkle.IsInitialized)
-            {
-                sparkle.Init(
-                    "https://sparkle-project.org/files/sparkletestcast.xml",
-                    "replace-with-public-key",
-                    Assembly.GetExecutingAssembly());
-
-                CompanyName = sparkle.CompanyName ?? "-";
-                AppName     = sparkle.AppName     ?? "-";
-                AppVersion  = sparkle.AppVersion  ?? "-";
-            }
-
-            await Task.Delay(2000);
             sparkle.CheckUpdateWithUI();
             Status = "Requested an update check.";
         }
