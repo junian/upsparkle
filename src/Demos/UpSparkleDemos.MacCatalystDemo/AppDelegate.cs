@@ -22,4 +22,18 @@ public class AppDelegate : UIApplicationDelegate {
 		// If any sessions were discarded while the application was not running, this will be called shortly after 'FinishedLaunching'.
 		// Use this method to release any resources that were specific to the discarded scenes, as they will not return.
 	}
+
+	public override void WillTerminate(UIApplication application)
+	{
+		foreach (var scene in UIApplication.SharedApplication.ConnectedScenes)
+		{
+			if (scene is UIWindowScene windowScene && windowScene.Delegate is SceneDelegate sceneDelegate)
+			{
+				if (sceneDelegate.Window?.RootViewController is ViewController viewController)
+				{
+					viewController.DisposeUpdater();
+				}
+			}
+		}
+	}
 }

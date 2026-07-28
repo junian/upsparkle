@@ -17,6 +17,9 @@
     -->
     <TrimMode Condition="'$(Configuration)' == 'Release'">full</TrimMode>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\UpSparkle\UpSparkle.csproj" />
+  </ItemGroup>
 
   <!-- Notes about the values set below:
     1. For macOS it's possible to sign both the app bundle (EnableCodesigning=true) and the package (*.pkg) (EnablePackageSigning=true),

@@ -15,15 +15,8 @@ public class SceneDelegate : UIResponder, IUIWindowSceneDelegate {
 		if (scene is UIWindowScene windowScene) {
 			Window ??= new UIWindow (windowScene);
 
-			// Create a 'UIViewController' with a single 'UILabel'
-			var vc = new UIViewController ();
-			vc.View!.AddSubview (new UILabel (Window!.Frame) {
-				BackgroundColor = UIColor.SystemBackground,
-				TextAlignment = UITextAlignment.Center,
-				Text = "Hello, Mac Catalyst!",
-				AutoresizingMask = UIViewAutoresizing.All,
-			});
-
+			// Use the new ViewController
+			var vc = new ViewController ();
 			Window.RootViewController = vc;
 			Window.MakeKeyAndVisible ();
 		}
