@@ -35,9 +35,10 @@
     <CLSCompliant>True</CLSCompliant>
     
     <!-- Versions -->
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <PackageVersion>$(AssemblyVersion)-alpha</PackageVersion>
     <ReleaseVersion>$(AssemblyVersion)</ReleaseVersion>
-    <Version>$(AssemblyVersion)-pre</Version>
+    <Version>$(AssemblyVersion)</Version>
     <FileVersion>$(AssemblyVersion)</FileVersion>
   </PropertyGroup>
 	
