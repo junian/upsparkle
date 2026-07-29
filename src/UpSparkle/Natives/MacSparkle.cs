@@ -135,21 +135,35 @@ namespace UpSparkle.Natives
         }
 
         /// <summary>
-        /// Configures and starts the Sparkle updater by setting the appcast URL and calling
-        /// <c>mac_sparkle_init</c>. The public key and app details are managed by the
-        /// Sparkle framework via the app bundle's <c>Info.plist</c> on macOS.
+        /// Set App Details to the native updater.
+        /// It does nothing to Sparkle on macOS, as Sparkle reads app details from the app bundle's Info.plist.
         /// </summary>
-        /// <param name="appCastUrl">The URL of the appcast XML feed.</param>
-        /// <param name="publicKey">
-        /// The EdDSA public key. Accepted for API consistency but handled natively via
-        /// <c>Info.plist</c> on macOS; this parameter is not forwarded to the Sparkle framework.
-        /// </param>
-        /// <param name="companyName">The name of the company or publisher (unused on macOS).</param>
-        /// <param name="appName">The display name of the application (unused on macOS).</param>
-        /// <param name="appVersion">The current version string of the application (unused on macOS).</param>
-        public void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
+        /// <param name="companyName"></param>
+        /// <param name="appName"></param>
+        /// <param name="appVersion"></param>
+        public void SetAppDetails(string companyName, string appName, string appVersion) { }
+
+        /// <summary>
+        /// Set Appcast URL to Sparkle native updater.
+        /// </summary>
+        /// <param name="appcastUrl"></param>
+        public void SetAppcastUrl(string appcastUrl)
         {
-            mac_sparkle_set_appcast_url(appCastUrl);
+            mac_sparkle_set_appcast_url(appcastUrl);
+        }
+
+        /// <summary>
+        /// Set EdDSA public key to Sparkle native updater.
+        /// It does nothing to Sparkle on macOS, as Sparkle reads the public key from the app bundle's Info.plist.
+        /// </summary>
+        /// <param name="edDSAPublicKey"></param>
+        public void SetEdDSAPublicKey(string edDSAPublicKey) { }
+
+        /// <summary>
+        /// Initialize and start the Sparkle framework.
+        /// </summary>
+        public void Initialize()
+        {
             mac_sparkle_init();
         }
 
@@ -163,11 +177,9 @@ namespace UpSparkle.Natives
         }
 
         /// <summary>
-        /// No-op on macOS. The Sparkle framework manages its own lifecycle through the
-        /// Objective-C runtime and does not require an explicit cleanup call.
+        /// Dispose the native Sparkle Updater.
+        /// It does not do anything on macOS, but is required for API consistency with other platforms.
         /// </summary>
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }

@@ -6,8 +6,17 @@
     <Nullable>disable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>disable</ImplicitUsings>
+
+    <Company>Junian.dev</Company>
+    <Product>WinForms Demo</Product>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyMetadata Include="SUFeedURL" Value="https://sparkle-project.org/files/sparkletestcast.xml" />
+    <AssemblyMetadata Include="SUPublicEDKey" Value="pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=" />
+  </ItemGroup>
+    
   <ItemGroup>
     <ProjectReference Include="..\..\UpSparkle\UpSparkle.csproj" />
   </ItemGroup>

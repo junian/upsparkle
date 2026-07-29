@@ -35,10 +35,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void Init()
     {
-        sparkle.Init(
+        /*
+        sparkle.Initialize(
+            Assembly.GetExecutingAssembly(),
             "https://sparkle-project.org/files/sparkletestcast.xml",
-            "replace-with-public-key",
-            Assembly.GetExecutingAssembly());
+            "replace-with-public-key");
+        */
+        sparkle.Initialize(Assembly.GetExecutingAssembly());
 
         CompanyName = sparkle.CompanyName ?? "-";
         AppName     = sparkle.AppName     ?? "-";

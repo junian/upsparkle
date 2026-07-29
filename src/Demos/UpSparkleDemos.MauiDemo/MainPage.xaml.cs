@@ -16,10 +16,14 @@ public partial class MainPage : ContentPage
 		_updater = new UpSparkleUpdater();
 		this.Loaded += (sender, args) =>
 		{
-			_updater.Init(
-				"https://sparkle-project.org/files/sparkletestcast.xml",
-				"MCwCFC9S9Yv8lzxX6BTMvR1/6K6O4sSVAhRNLAnl9jH+P86p5595B0vC+59L",
-				Assembly.GetExecutingAssembly());
+			/*
+			_updater.Initialize(
+                Assembly.GetExecutingAssembly(),
+                "https://sparkle-project.org/files/sparkletestcast.xml",
+				"MCwCFC9S9Yv8lzxX6BTMvR1/6K6O4sSVAhRNLAnl9jH+P86p5595B0vC+59L");
+			*/
+
+			_updater.Initialize(Assembly.GetExecutingAssembly());
 		};
 
 		this.Disappearing += (sender, args) =>

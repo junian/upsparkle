@@ -159,20 +159,39 @@ namespace UpSparkle.Natives
         }
 
         /// <summary>
-        /// Configures and starts the WinSparkle updater with the supplied application details.
-        /// Sets the appcast URL, the EdDSA public key, and the app metadata, then calls
-        /// <c>win_sparkle_init</c> to start the background update check timer.
+        /// Set App Details to the native updater
         /// </summary>
-        /// <param name="appCastUrl">The URL of the appcast XML feed.</param>
-        /// <param name="publicKey">The EdDSA public key (Base64-encoded) for signature verification.</param>
         /// <param name="companyName">The name of the company or publisher.</param>
         /// <param name="appName">The display name of the application.</param>
         /// <param name="appVersion">The current version string of the application.</param>
-        public void Init(string appCastUrl, string publicKey, string companyName, string appName, string appVersion)
+        public void SetAppDetails(string companyName, string appName, string appVersion)
         {
-            win_sparkle_set_appcast_url(appCastUrl);
-            win_sparkle_set_eddsa_public_key(publicKey);
             win_sparkle_set_app_details(companyName, appName, appVersion);
+        }
+
+        /// <summary>
+        /// Set the Appcast URL for the native updater
+        /// </summary>
+        /// <param name="appcastUrl">The URL of the appcast XML feed.</param>
+        public void SetAppcastUrl(string appcastUrl)
+        {
+            win_sparkle_set_appcast_url(appcastUrl);
+        }
+
+        /// <summary>
+        /// Set the EdDSA public key for signature verification in the native updater
+        /// </summary>
+        /// <param name="edDSAPublicKey">The EdDSA public key (Base64-encoded) for signature verification.</param>
+        public void SetEdDSAPublicKey(string edDSAPublicKey)
+        {
+            win_sparkle_set_eddsa_public_key(edDSAPublicKey);
+        }
+
+        /// <summary>
+        /// Initialize and starts WinSparkle.
+        /// </summary>
+        public void Initialize()
+        {
             win_sparkle_init();
         }
 

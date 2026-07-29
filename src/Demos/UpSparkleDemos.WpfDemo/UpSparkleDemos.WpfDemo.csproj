@@ -6,7 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+
+    <Company>Junian.dev</Company>
+    <Product>WPF Demo</Product>
+    <Version>0.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+      <AssemblyMetadata Include="SUFeedURL" Value="https://sparkle-project.org/files/sparkletestcast.xml" />
+      <AssemblyMetadata Include="SUPublicEDKey" Value="pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\UpSparkle\UpSparkle.csproj" />

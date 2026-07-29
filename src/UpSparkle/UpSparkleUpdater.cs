@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UpSparkle.Natives;
@@ -11,77 +10,150 @@ namespace UpSparkle
     /// and WinSparkle on Windows. Create one instance per application and keep it alive
     /// for the lifetime of the process.
     /// </summary>
-    public class UpSparkleUpdater
+    public class UpSparkleUpdater: IDisposable
     {
         private readonly INativeSparkle nativeSparkle = CreateNativeSparkle();
 
         /// <summary>
-        /// Gets a value indicating whether <see cref="Init(string,string,string,string,string)"/>
+        /// The metadata key used to embed the appcast feed URL in an assembly via
+        /// <see cref="AssemblyMetadataAttribute"/>.
+        /// Matches the macOS <c>Info.plist</c> key used by the Sparkle framework.
+        /// </summary>
+        /// <example>
+        /// In your <c>.csproj</c> (works on .NET Framework and modern .NET):
+        /// <code>
+        /// &lt;ItemGroup&gt;
+        ///   &lt;AssemblyMetadata Include="SUFeedURL" Value="https://example.com/appcast.xml" /&gt;
+        /// &lt;/ItemGroup&gt;
+        /// </code>
+        /// Or in <c>AssemblyInfo.cs</c> for classic .NET Framework projects:
+        /// <code>
+        /// [assembly: AssemblyMetadata("SUFeedURL", "https://example.com/appcast.xml")]
+        /// </code>
+        /// </example>
+        public const string AppcastUrlMetadataKey = "SUFeedURL";
+
+        /// <summary>
+        /// The metadata key used to embed the EdDSA public key in an assembly via
+        /// <see cref="AssemblyMetadataAttribute"/>.
+        /// Matches the macOS <c>Info.plist</c> key used by the Sparkle framework.
+        /// </summary>
+        /// <example>
+        /// In your <c>.csproj</c> (works on .NET Framework and modern .NET):
+        /// <code>
+        /// &lt;ItemGroup&gt;
+        ///   &lt;AssemblyMetadata Include="SUPublicEDKey" Value="&lt;your-base64-key&gt;" /&gt;
+        /// &lt;/ItemGroup&gt;
+        /// </code>
+        /// Or in <c>AssemblyInfo.cs</c> for classic .NET Framework projects:
+        /// <code>
+        /// [assembly: AssemblyMetadata("SUPublicEDKey", "&lt;your-base64-key&gt;")]
+        /// </code>
+        /// </example>
+        public const string EdDSAPublicKeyMetadataKey = "SUPublicEDKey";
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="Initialize(string,string,string,string,string)"/>
         /// has been called successfully and the native updater is ready to use.
         /// </summary>
         public bool IsInitialized { get; private set; }
 
         /// <summary>
-        /// Gets the appcast URL that was supplied to <see cref="Init(string,string,string,string,string)"/>.
+        /// Gets the appcast URL that was supplied to <see cref="Initialize(string,string,string,string,string)"/>.
         /// Returns <see langword="null"/> before initialization.
         /// </summary>
-        public string AppCastUrl { get; private set; }
+        public string AppcastUrl { get; private set; }
 
         /// <summary>
-        /// Gets the EdDSA public key that was supplied to <see cref="Init(string,string,string,string,string)"/>.
+        /// Gets the EdDSA public key that was supplied to <see cref="Initialize(string,string,string,string,string)"/>.
         /// Returns <see langword="null"/> before initialization.
         /// </summary>
-        public string PublicKey { get; private set; }
+        public string EdDSAPublicKey { get; private set; }
 
         /// <summary>
         /// Gets the company name that was supplied to (or resolved by)
-        /// <see cref="Init(string,string,string,string,string)"/>.
+        /// <see cref="Initialize(string,string,string,string,string)"/>.
         /// Returns <see langword="null"/> before initialization.
         /// </summary>
         public string CompanyName { get; private set; }
 
         /// <summary>
         /// Gets the application name that was supplied to (or resolved by)
-        /// <see cref="Init(string,string,string,string,string)"/>.
+        /// <see cref="Initialize(string,string,string,string,string)"/>.
         /// Returns <see langword="null"/> before initialization.
         /// </summary>
         public string AppName { get; private set; }
 
         /// <summary>
         /// Gets the application version that was supplied to (or resolved by)
-        /// <see cref="Init(string,string,string,string,string)"/>.
+        /// <see cref="Initialize(string,string,string,string,string)"/>.
         /// Returns <see langword="null"/> before initialization.
         /// </summary>
         public string AppVersion { get; private set; }
 
         /// <summary>
-        /// Initializes the native updater by reading the company name, application name, and
-        /// version from the supplied assembly's attributes
-        /// (<see cref="AssemblyCompanyAttribute"/>, <see cref="AssemblyProductAttribute"/>,
-        /// and <see cref="AssemblyInformationalVersionAttribute"/> / <see cref="AssemblyVersionAttribute"/>).
-        /// Any build-metadata suffix (e.g. <c>+abc123</c>) is stripped from the version string
-        /// before it is passed to the native layer.
+        /// Initializes the native updater by resolving application details from the supplied
+        /// assembly's attributes. The appcast URL and EdDSA public key can be embedded in the
+        /// assembly via <see cref="AssemblyMetadataAttribute"/> (set in the <c>.csproj</c> or
+        /// <c>AssemblyInfo.cs</c>) and will be used as fallbacks when the corresponding
+        /// parameters are <see langword="null"/> or empty.
+        /// <para>
+        /// Resolution order for <paramref name="appcastUrl"/>:
+        /// <list type="number">
+        ///   <item>The <paramref name="appcastUrl"/> parameter, if provided.</item>
+        ///   <item><see cref="AssemblyMetadataAttribute"/> with key <c>"SUFeedURL"</c>
+        ///         (<see cref="AppcastUrlMetadataKey"/>).</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// Resolution order for <paramref name="edDSAPublicKey"/>:
+        /// <list type="number">
+        ///   <item>The <paramref name="edDSAPublicKey"/> parameter, if provided.</item>
+        ///   <item><see cref="AssemblyMetadataAttribute"/> with key <c>"SUPublicEDKey"</c>
+        ///         (<see cref="EdDSAPublicKeyMetadataKey"/>).</item>
+        /// </list>
+        /// </para>
+        /// <para>
+        /// Company name, product name, and version are always read from
+        /// <see cref="AssemblyCompanyAttribute"/>, <see cref="AssemblyProductAttribute"/>,
+        /// and <see cref="AssemblyInformationalVersionAttribute"/> respectively.
+        /// Any build-metadata suffix (e.g. <c>+abc123</c>) is stripped from the version.
+        /// </para>
         /// </summary>
-        /// <param name="appCastUrl">
-        /// The URL of the appcast XML feed that the native framework will poll for updates.
-        /// </param>
-        /// <param name="publicKey">
-        /// The EdDSA public key (Base64-encoded) used to verify update signatures.
-        /// </param>
         /// <param name="assemblyInfo">
-        /// The assembly whose attributes provide the company name, product name, and version.
+        /// The assembly whose attributes provide all required values.
         /// Pass <c>Assembly.GetExecutingAssembly()</c> for the typical case.
+        /// </param>
+        /// <param name="appcastUrl">
+        /// The URL of the appcast XML feed. When <see langword="null"/> or empty, the value
+        /// is resolved from an <see cref="AssemblyMetadataAttribute"/> with key
+        /// <c>"SUFeedURL"</c> embedded in <paramref name="assemblyInfo"/>.
+        /// </param>
+        /// <param name="edDSAPublicKey">
+        /// The EdDSA public key (Base64-encoded) for verifying update signatures. When
+        /// <see langword="null"/> or empty, the value is resolved from an
+        /// <see cref="AssemblyMetadataAttribute"/> with key <c>"SUPublicEDKey"</c> embedded
+        /// in <paramref name="assemblyInfo"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="assemblyInfo"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// Thrown when the assembly is missing required attributes or version information.
+        /// Thrown when a required value cannot be resolved from the parameters or the
+        /// assembly's attributes.
         /// </exception>
-        public virtual void Init(string appCastUrl, string publicKey, Assembly assemblyInfo)
+        public void Initialize(Assembly assemblyInfo, string appcastUrl = null, string edDSAPublicKey = null)
         {
-            if(assemblyInfo == null)
+            if (assemblyInfo == null)
                 throw new ArgumentNullException(nameof(assemblyInfo));
+
+            // Resolve appcast URL: parameter → assembly metadata fallback
+            if (string.IsNullOrWhiteSpace(appcastUrl))
+                appcastUrl = GetAssemblyMetadata(assemblyInfo, AppcastUrlMetadataKey);
+
+            // Resolve EdDSA public key: parameter → assembly metadata fallback
+            if (string.IsNullOrWhiteSpace(edDSAPublicKey))
+                edDSAPublicKey = GetAssemblyMetadata(assemblyInfo, EdDSAPublicKeyMetadataKey);
 
             var companyName = assemblyInfo.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company
                               ?? throw new ArgumentException("Assembly is missing AssemblyCompanyAttribute.",
@@ -103,34 +175,44 @@ namespace UpSparkle
             if (plusIndex >= 0)
                 appVersion = appVersion.Substring(0, plusIndex);
 
-            Init(appCastUrl, publicKey, companyName, appName, appVersion);
+            Initialize(companyName, appName, appVersion, appcastUrl, edDSAPublicKey);
         }
 
         /// <summary>
         /// Initializes the native updater with the supplied application details and starts
         /// the underlying Sparkle / WinSparkle framework.
         /// </summary>
-        /// <param name="appCastUrl">
-        /// The URL of the appcast XML feed that the native framework will poll for updates.
-        /// </param>
-        /// <param name="publicKey">
-        /// The EdDSA public key (Base64-encoded) used to verify update signatures.
-        /// </param>
         /// <param name="companyName">The name of the company or publisher.</param>
         /// <param name="appName">The display name of the application.</param>
         /// <param name="appVersion">
         /// The current version string of the application (e.g. <c>"1.2.3"</c>).
         /// </param>
-        public virtual void Init(string appCastUrl, string publicKey, string companyName, string appName,
-            string appVersion)
+        /// <param name="appcastUrl">
+        /// The URL of the appcast XML feed that the native framework will poll for updates.
+        /// </param>
+        /// <param name="edDSAPublicKey">
+        /// The EdDSA public key (Base64-encoded) used to verify update signatures.
+        /// </param>
+        private void Initialize(
+            string companyName, string appName, string appVersion,
+            string appcastUrl, 
+            string edDSAPublicKey)
         {
-            AppCastUrl = appCastUrl;
-            PublicKey = publicKey;
             CompanyName = companyName;
             AppName = appName;
             AppVersion = appVersion;
+            nativeSparkle.SetAppDetails(CompanyName, AppName, AppVersion);
 
-            nativeSparkle.Init(appCastUrl, publicKey, companyName, appName, appVersion);
+            AppcastUrl = appcastUrl;
+            nativeSparkle.SetAppcastUrl(AppcastUrl);
+
+            if(!string.IsNullOrWhiteSpace(edDSAPublicKey))
+            {
+                EdDSAPublicKey = edDSAPublicKey;
+                nativeSparkle.SetEdDSAPublicKey(EdDSAPublicKey);
+            }
+
+            nativeSparkle.Initialize();
             IsInitialized = true;
         }
 
@@ -138,9 +220,9 @@ namespace UpSparkle
         /// Opens the native update UI so the user can review and install any available update.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the updater has not been initialized via <see cref="Init(string,string,string,string,string)"/>.
+        /// Thrown when the updater has not been initialized via <see cref="Initialize()"/>.
         /// </exception>
-        public virtual void CheckUpdateWithUI()
+        public void CheckUpdateWithUI()
         {
             if (!IsInitialized)
             {
@@ -159,6 +241,26 @@ namespace UpSparkle
         {
             nativeSparkle.Dispose();
             IsInitialized = false;
+        }
+
+        /// <summary>
+        /// Looks up a single <see cref="AssemblyMetadataAttribute"/> value by key.
+        /// Returns <see langword="null"/> when no matching attribute is found.
+        /// Uses the non-generic <c>GetCustomAttributes</c> API for compatibility with
+        /// .NET Framework 4.6.2 targets where the generic overload may not be available.
+        /// </summary>
+        /// <param name="assembly">The assembly to inspect.</param>
+        /// <param name="key">The metadata key to look up.</param>
+        /// <returns>The attribute value, or <see langword="null"/> if not found.</returns>
+        private static string GetAssemblyMetadata(Assembly assembly, string key)
+        {
+            var attrs = assembly.GetCustomAttributes(typeof(AssemblyMetadataAttribute), false);
+            foreach (AssemblyMetadataAttribute attr in attrs)
+            {
+                if (attr.Key == key)
+                    return attr.Value;
+            }
+            return null;
         }
 
         /// <summary>
