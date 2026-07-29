@@ -16,7 +16,7 @@
     <Summary>$(Description)</Summary>
     <PackageTags>sparkle,winsparkle,updater,macos,maccatalys,windows</PackageTags>
     <Title>UpSparkle</Title>
-    <Description>Easy-to-use licensing library for .NET and .NET Framework products.</Description>
+    <Description>Easy-to-use updater for .NET applications. Thin .NET wrapper around WinSparkle (Windows) and Sparkle (macOS).</Description>
     <PackageId>UpSparkle</PackageId>
     <Copyright>Copyright (c) 2026</Copyright>
     <RepositoryUrl>https://github.com/junian/upsparkle</RepositoryUrl>
