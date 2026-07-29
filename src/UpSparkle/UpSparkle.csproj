@@ -4,13 +4,52 @@
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <IsPackable>true</IsPackable>
-    <PackageId>Upsparkle</PackageId>
-    <Version>0.0.1</Version>
-    <Authors>junian</Authors>
-    <Description>Cross-platform updater for .NET desktop apps.</Description>
-  </PropertyGroup>
 
+    <IsPackable>true</IsPackable>
+    <RootNamespace>UpSparkle</RootNamespace>
+    <AssemblyName>UpSparkle</AssemblyName>
+    <Authors>Junian Triajianto</Authors>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Owners>junian</Owners>
+    <PackageProjectUrl>https://www.junian.dev/upsparkle/</PackageProjectUrl>
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../../ReleaseNotes.txt"))</PackageReleaseNotes>
+    <Summary>$(Description)</Summary>
+    <PackageTags>sparkle,winsparkle,updater,macos,maccatalys,windows</PackageTags>
+    <Title>UpSparkle</Title>
+    <Description>Easy-to-use licensing library for .NET and .NET Framework products.</Description>
+    <PackageId>UpSparkle</PackageId>
+    <Copyright>Copyright (c) 2026</Copyright>
+    <RepositoryUrl>https://github.com/junian/upsparkle</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <!--
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Standard.Licensing.snk</AssemblyOriginatorKeyFile>
+    -->
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <!--
+    <PackageIcon>standard-licensing-logo.png</PackageIcon>
+    -->
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <CLSCompliant>True</CLSCompliant>
+    
+    <!-- Versions -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <ReleaseVersion>$(AssemblyVersion)</ReleaseVersion>
+    <Version>$(AssemblyVersion)</Version>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\README.md" Pack="true" PackagePath="\" />
+    <!--
+    <None Include="..\..\assets\img\standard-licensing-logo.png" Pack="true" PackagePath="\" />
+    -->
+  </ItemGroup>
+
+  <!-- Expose Internals to Tests -->
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>UpSparkle.Tests</_Parameter1>
