@@ -44,6 +44,8 @@
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
     <None Include="..\..\docs\README.md" Pack="true" PackagePath="\" />
+    <!-- MSBuild targets file: imported by consuming projects automatically. -->
+    <None Include="build\UpSparkle.targets" Pack="true" PackagePath="build\UpSparkle.targets" />
     <!--
     <None Include="..\..\assets\img\standard-licensing-logo.png" Pack="true" PackagePath="\" />
     -->
@@ -60,16 +62,16 @@
   <ItemGroup>
     <!-- Sparkle.tar.xz: packed into the NuGet as runtimes/osx/native/Sparkle.tar.xz.
          Never copied to the output directory — extraction happens at build time on macOS
-         via the ExtractSparkleFramework target below. -->
+         via the build/UpSparkle.targets file (imported by consuming projects). -->
     <None Include="..\..\runtimes\osx\native\Sparkle.tar.xz"
           Pack="true"
           PackagePath="runtimes/osx/native/Sparkle.tar.xz"
           CopyToOutputDirectory="Never" />
 
     <!-- Sparkle.framework: present locally after running getlibs.sh / Get-Libraries.ps1.
-         Used by the macOS build and for local development/testing.
+         Used by the macOS build and for local development/testing of UpSparkle itself.
          Never packed into NuGet (symlinks would be corrupted by ZIP).
-         Never copied to output — the post-build target below handles that. -->
+         Copied to output during local dev builds via the Import below. -->
     <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
           Pack="false"
           CopyToOutputDirectory="Never">
@@ -84,43 +86,8 @@
     </None>
   </ItemGroup>
 
-  <!-- Extract Sparkle.framework from Sparkle.tar.xz into the output directory.
-       Only runs on macOS, only during a normal build — skipped during dotnet pack.
-       Skipped if Sparkle.framework already exists in the output directory. -->
-  <Target Name="SetSkipSparkleExtractionForPack" BeforeTargets="Pack">
-    <PropertyGroup>
-      <SkipSparkleExtraction>true</SkipSparkleExtraction>
-    </PropertyGroup>
-  </Target>
-
-  <Target Name="ExtractSparkleFramework"
-          AfterTargets="Build"
-          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'
-                     And '$(SkipSparkleExtraction)' != 'true'">
-
-    <PropertyGroup>
-      <_SparkleOutputDir>$(OutDir)runtimes/osx/native</_SparkleOutputDir>
-      <_SparkleFrameworkDir>$(_SparkleOutputDir)/Sparkle.framework</_SparkleFrameworkDir>
-      <_SparkleTarXz>$(MSBuildProjectDirectory)/../../runtimes/osx/native/Sparkle.tar.xz</_SparkleTarXz>
-    </PropertyGroup>
-
-    <MakeDir Directories="$(_SparkleOutputDir)"
-             Condition="!Exists('$(_SparkleOutputDir)')" />
-
-    <Message Text="Sparkle.framework already present at $(_SparkleFrameworkDir), skipping extraction."
-             Importance="normal"
-             Condition="Exists('$(_SparkleFrameworkDir)')" />
-
-    <Exec Command="tar -xJf &quot;$(_SparkleTarXz)&quot; -C &quot;$(_SparkleOutputDir)&quot;"
-          Condition="!Exists('$(_SparkleFrameworkDir)') And Exists('$(_SparkleTarXz)')" />
-
-    <Message Text="Extracted Sparkle.framework to $(_SparkleFrameworkDir)."
-             Importance="high"
-             Condition="!Exists('$(_SparkleFrameworkDir)') And Exists('$(_SparkleTarXz)')" />
-
-    <Warning Text="Sparkle.tar.xz not found at $(_SparkleTarXz). Run getlibs.sh to fetch native dependencies."
-             Condition="!Exists('$(_SparkleFrameworkDir)') And !Exists('$(_SparkleTarXz)')" />
-  </Target>
+  <!-- Import build/UpSparkle.targets so the extraction logic also runs during local dev builds. -->
+  <Import Project="build\UpSparkle.targets" />
 
   <!-- WinSparkle (Windows) -->
   <ItemGroup>
