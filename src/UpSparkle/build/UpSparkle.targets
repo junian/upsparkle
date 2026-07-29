@@ -1,18 +1,24 @@
 <Project>
 
   <!--
-    ExtractSparkleFramework
-    =======================
-    Runs in the *consuming* project after its Build completes (on macOS only).
-    Extracts Sparkle.framework from the Sparkle.tar.xz bundled in the NuGet package
-    into the consumer's output runtimes/osx/native/ directory, preserving all symlinks.
+    UpSparkle MSBuild targets
+    =========================
+    These targets run in the *consuming* project on macOS only.
 
-    Skipped when:
-      - Not running on macOS
-      - $(SkipSparkleExtraction) == true  (set automatically during dotnet pack,
-                                           or manually to opt out)
-      - Sparkle.framework is already present in the output directory
+    1. UpSparkle_ExtractSparkleFramework  (AfterTargets="ResolveReferences")
+       Extracts Sparkle.framework from Sparkle.tar.xz (bundled in the NuGet package)
+       into a staging directory under $(IntermediateOutputPath), preserving symlinks.
+       Skipped when already extracted or when packing.
+
+    2. UpSparkle_AddSparkleNativeFramework  (AfterTargets="UpSparkle_ExtractSparkleFramework")
+       Adds the extracted Sparkle.framework to the @(NativeFramework) item group so
+       the .NET macOS SDK copies it into the app bundle's Contents/Frameworks/ folder
+       during build and publish.
   -->
+
+  <!-- =========================================================== -->
+  <!-- Opt-out: set SkipSparkleExtraction=true during dotnet pack  -->
+  <!-- =========================================================== -->
 
   <Target Name="UpSparkle_SetSkipForPack" BeforeTargets="Pack">
     <PropertyGroup>
@@ -20,41 +26,68 @@
     </PropertyGroup>
   </Target>
 
+  <!-- =========================================================== -->
+  <!-- Step 1: extract Sparkle.framework into the staging dir      -->
+  <!-- =========================================================== -->
+
   <Target Name="UpSparkle_ExtractSparkleFramework"
-          AfterTargets="Build"
+          AfterTargets="ResolveReferences"
           Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'
                      And '$(SkipSparkleExtraction)' != 'true'">
 
     <!--
-      $(MSBuildThisFileDirectory) resolves to the build/ folder inside the NuGet
-      package cache, e.g.:
-        ~/.nuget/packages/upsparkle/1.0.0/build/
-      Sparkle.tar.xz sits at:
-        ~/.nuget/packages/upsparkle/1.0.0/runtimes/osx/native/Sparkle.tar.xz
+      $(MSBuildThisFileDirectory) = <package-cache>/upsparkle/<ver>/build/
+      Sparkle.tar.xz is at      = <package-cache>/upsparkle/<ver>/runtimes/osx/native/Sparkle.tar.xz
+      We stage into IntermediateOutputPath so the framework is available to the
+      NativeFramework item group before the app bundle is assembled.
     -->
     <PropertyGroup>
       <_UpSparkle_PackageRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../'))</_UpSparkle_PackageRoot>
       <_UpSparkle_TarXz>$(_UpSparkle_PackageRoot)runtimes/osx/native/Sparkle.tar.xz</_UpSparkle_TarXz>
-      <_UpSparkle_OutputDir>$(OutDir)runtimes/osx/native</_UpSparkle_OutputDir>
-      <_UpSparkle_FrameworkDir>$(_UpSparkle_OutputDir)/Sparkle.framework</_UpSparkle_FrameworkDir>
+      <_UpSparkle_StagingDir>$(IntermediateOutputPath)upsparkle/osx/native</_UpSparkle_StagingDir>
+      <_UpSparkle_FrameworkDir>$(_UpSparkle_StagingDir)/Sparkle.framework</_UpSparkle_FrameworkDir>
     </PropertyGroup>
 
-    <MakeDir Directories="$(_UpSparkle_OutputDir)"
-             Condition="!Exists('$(_UpSparkle_OutputDir)')" />
+    <MakeDir Directories="$(_UpSparkle_StagingDir)"
+             Condition="!Exists('$(_UpSparkle_StagingDir)')" />
 
-    <Message Text="[UpSparkle] Sparkle.framework already present at $(_UpSparkle_FrameworkDir), skipping extraction."
+    <Message Text="[UpSparkle] Sparkle.framework already staged at $(_UpSparkle_FrameworkDir), skipping extraction."
              Importance="normal"
              Condition="Exists('$(_UpSparkle_FrameworkDir)')" />
 
-    <Exec Command="tar -xJf &quot;$(_UpSparkle_TarXz)&quot; -C &quot;$(_UpSparkle_OutputDir)&quot;"
+    <Exec Command="tar -xJf &quot;$(_UpSparkle_TarXz)&quot; -C &quot;$(_UpSparkle_StagingDir)&quot;"
           Condition="!Exists('$(_UpSparkle_FrameworkDir)') And Exists('$(_UpSparkle_TarXz)')" />
 
     <Message Text="[UpSparkle] Extracted Sparkle.framework to $(_UpSparkle_FrameworkDir)."
              Importance="high"
-             Condition="!Exists('$(_UpSparkle_FrameworkDir)') And Exists('$(_UpSparkle_TarXz)')" />
+             Condition="Exists('$(_UpSparkle_FrameworkDir)')" />
 
     <Warning Text="[UpSparkle] Sparkle.tar.xz not found at $(_UpSparkle_TarXz). The NuGet package may be corrupt or incomplete."
              Condition="!Exists('$(_UpSparkle_FrameworkDir)') And !Exists('$(_UpSparkle_TarXz)')" />
+
+  </Target>
+
+  <!-- =========================================================== -->
+  <!-- Step 2: register with NativeFramework so the SDK bundles it -->
+  <!-- =========================================================== -->
+
+  <Target Name="UpSparkle_AddSparkleNativeFramework"
+          AfterTargets="UpSparkle_ExtractSparkleFramework"
+          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'
+                     And '$(SkipSparkleExtraction)' != 'true'">
+
+    <PropertyGroup>
+      <_UpSparkle_StagingDir>$(IntermediateOutputPath)upsparkle/osx/native</_UpSparkle_StagingDir>
+      <_UpSparkle_FrameworkDir>$(_UpSparkle_StagingDir)/Sparkle.framework</_UpSparkle_FrameworkDir>
+    </PropertyGroup>
+
+    <ItemGroup Condition="Exists('$(_UpSparkle_FrameworkDir)')">
+      <NativeFramework Include="$(_UpSparkle_FrameworkDir)" />
+    </ItemGroup>
+
+    <Message Text="[UpSparkle] Registered Sparkle.framework as NativeFramework for app bundle inclusion."
+             Importance="normal"
+             Condition="Exists('$(_UpSparkle_FrameworkDir)')" />
 
   </Target>
 
