@@ -16,12 +16,14 @@ echo "Extracting Sparkle ..."
 mkdir -p "${RUNTIMES_DIR}/osx/native"
 tar -Jxf libs/Sparkle*.tar.xz -C "libs"
 mv libs/Sparkle.framework "${RUNTIMES_DIR}/osx/native/."
+rm libs/Sparkle*.tar.xz
 
-# Rename versioned archive to a fixed name so the csproj can reference it directly.
-SPARKLE_ARCHIVE=$(ls libs/Sparkle*.tar.xz 2>/dev/null | head -n 1)
-if [ -n "$SPARKLE_ARCHIVE" ]; then
-    mv "$SPARKLE_ARCHIVE" "${RUNTIMES_DIR}/osx/native/Sparkle.tar.xz"
-fi
+# Re-pack only Sparkle.framework into a new Sparkle.tar.xz with symlinks preserved.
+# Using a relative path inside the archive so it extracts as Sparkle.framework/
+echo "Repacking Sparkle.framework -> runtimes/osx/native/Sparkle.tar.xz ..."
+tar -cJf "${RUNTIMES_DIR}/osx/native/Sparkle.tar.xz" \
+    -C "${RUNTIMES_DIR}/osx/native" \
+    Sparkle.framework
 
 echo "Extracting MacSparkle ..."
 
