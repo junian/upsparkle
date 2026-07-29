@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using UpSparkle.Natives;
 
 namespace UpSparkle
@@ -12,7 +13,26 @@ namespace UpSparkle
     /// </summary>
     public class UpSparkleUpdater: IDisposable
     {
-        private readonly INativeSparkle nativeSparkle = CreateNativeSparkle();
+        private readonly INativeSparkle nativeSparkle;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="UpSparkleUpdater"/> using the
+        /// platform-appropriate native Sparkle implementation.
+        /// </summary>
+        public UpSparkleUpdater()
+        {
+            nativeSparkle = CreateNativeSparkle();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="UpSparkleUpdater"/> with an explicit
+        /// <see cref="INativeSparkle"/> implementation. Intended for unit testing only.
+        /// </summary>
+        /// <param name="nativeSparkle">The native Sparkle implementation to use.</param>
+        internal UpSparkleUpdater(INativeSparkle nativeSparkle)
+        {
+            this.nativeSparkle = nativeSparkle ?? throw new ArgumentNullException(nameof(nativeSparkle));
+        }
 
         /// <summary>
         /// The metadata key used to embed the appcast feed URL in an assembly via
@@ -179,6 +199,19 @@ namespace UpSparkle
         }
 
         /// <summary>
+        /// Initializes the native updater with the specified application details.
+        /// </summary>
+        /// <param name="assemblyInfo"></param>
+        /// <param name="appcastUrl"></param>
+        /// <param name="edDSAPublicKey"></param>
+        /// <returns></returns>
+        public Task InitializeAsync(Assembly assemblyInfo, string appcastUrl = null, string edDSAPublicKey = null)
+        {
+            this.Initialize(assemblyInfo, appcastUrl, edDSAPublicKey);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Initializes the native updater with the supplied application details and starts
         /// the underlying Sparkle / WinSparkle framework.
         /// </summary>
@@ -230,6 +263,16 @@ namespace UpSparkle
             }
 
             nativeSparkle.CheckUpdateWithUI();
+        }
+
+        /// <summary>
+        /// Opens the native update UI so the user can review and install any available update.
+        /// </summary>
+        /// <returns></returns>
+        public Task CheckUpdateWithUIAsync()
+        {
+            this.CheckUpdateWithUI();
+            return Task.CompletedTask;
         }
 
         /// <summary>

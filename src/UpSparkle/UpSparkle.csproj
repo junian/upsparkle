@@ -11,6 +11,12 @@
     <Description>Cross-platform updater for .NET desktop apps.</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>UpSparkle.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <!-- Sparkle.framework (macOS) -->
   <ItemGroup>
     <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
