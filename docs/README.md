@@ -16,8 +16,6 @@ UpSparkle gives .NET desktop apps a cross-platform auto-update UI without any pl
 - **Windows** — wraps [WinSparkle](https://winsparkle.org)
 - **macOS / Mac Catalyst** — wraps [Sparkle](https://sparkle-project.org)
 
----
-
 ## Quickstart
 
 ### 1. Install the NuGet package
@@ -31,8 +29,6 @@ Or via Package Manager Console in Visual Studio:
 ```powershell
 Install-Package Upsparkle
 ```
-
----
 
 ### 2. Configure your project
 
@@ -118,8 +114,6 @@ For the full list of supported keys see the [Sparkle customization docs](https:/
 
 To generate your EdDSA key pair, use the `generate_keys` tool that ships with Sparkle. See the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) for step-by-step instructions.
 
----
-
 ### 3. Initialize the updater
 
 Create one `UpSparkleUpdater` instance per application (typically at startup) and call `Initialize`. The simplest form reads everything from the executing assembly:
@@ -146,15 +140,13 @@ updater.Initialize(
 After a successful call, the following properties are available:
 
 | Property | Description |
-|---|---|
+|----------|-------------|
 | `IsInitialized` | `true` once `Initialize` has succeeded |
 | `AppcastUrl` | The resolved appcast feed URL |
 | `EdDSAPublicKey` | The resolved EdDSA public key |
 | `CompanyName` | Resolved from `AssemblyCompanyAttribute` |
 | `AppName` | Resolved from `AssemblyProductAttribute` |
 | `AppVersion` | Resolved from `AssemblyInformationalVersionAttribute` (build metadata suffix stripped) |
-
----
 
 ### 4. Check for updates
 
@@ -166,8 +158,6 @@ updater.CheckUpdateWithUI();
 
 > `CheckUpdateWithUI` throws `InvalidOperationException` if called before `Initialize`.
 
----
-
 ### 5. Clean up on exit
 
 Dispose the updater when the application closes to release native resources:
@@ -177,8 +167,6 @@ updater.Dispose();
 ```
 
 After disposal, `IsInitialized` is reset to `false`.
-
----
 
 ## Full Examples
 
@@ -291,8 +279,6 @@ public partial class MainPage : ContentPage
 }
 ```
 
----
-
 ## API Reference
 
 ### `UpSparkleUpdater`
@@ -319,15 +305,11 @@ Starts the native Sparkle / WinSparkle framework. Reads company name, app name, 
 
 Throws `ArgumentNullException` if `assemblyInfo` is null. Throws `ArgumentException` if a required value cannot be resolved.
 
----
-
 ```csharp
 void CheckUpdateWithUI()
 ```
 
 Opens the native update UI. Throws `InvalidOperationException` if called before `Initialize`.
-
----
 
 ```csharp
 void Dispose()
@@ -357,12 +339,10 @@ const string EdDSAPublicKeyMetadataKey = "SUPublicEDKey";
 
 Keys used to look up `AssemblyMetadata` values from the assembly. Match the corresponding `Info.plist` keys on macOS.
 
----
-
 ## Supported Platforms
 
 | Platform | Minimum version |
-|---|---|
+|----------|-----------------|
 | Windows (x86 / x64 / Arm64) | .NET Framework 4.6.2, or .NET 6+ |
 | macOS (Apple Silicon / Intel) | .NET 6+ |
 | Mac Catalyst (Apple Silicon / Intel) | .NET 6+ |
@@ -373,15 +353,11 @@ Tested project types:
 
 **macOS** — .NET macOS, MAUI (Mac Catalyst), Avalonia UI, Uno Platform
 
----
-
 ## Appcast & Signing
 
 UpSparkle requires an [appcast XML feed](https://sparkle-project.org/documentation/publishing/) hosted at a public URL. Every update package must be signed with an EdDSA key pair.
 
 Generate your keys with the `generate_keys` tool that ships with Sparkle, then follow the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) to sign your releases.
-
----
 
 ## Development
 
@@ -400,8 +376,6 @@ Before starting development, fetch the native dependencies by running the script
 ```
 
 Both scripts download and extract binaries based on `.gitbinmodules` into the `libs` directory. To use a different version of Sparkle or WinSparkle, edit `.gitbinmodules` and re-run the script.
-
----
 
 ## Credits
 
