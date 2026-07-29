@@ -37,14 +37,29 @@ The `Init` call reads your app's metadata from the executing assembly, so make s
 #### Windows — set assembly metadata in your `.csproj`
 
 ```xml
-<PropertyGroup>
-  <Company>Acme Corp</Company>
-  <Product>My App</Product>
-  <Version>1.0.0</Version>
-</PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!-- ... -->
+        <!-- other properties here -->
+        <!-- ... -->
+
+        <Company>Wayne Enterprise</Company>
+        <Product>BatComputer App</Product>
+        <Version>1.0.0</Version>
+    </PropertyGroup>
+</Project>
 ```
 
 These map to `AssemblyCompanyAttribute`, `AssemblyProductAttribute`, and `AssemblyInformationalVersionAttribute` respectively, which UpSparkle reads at runtime.
+
+Add this metadata below `PropertyGroup`:
+
+```xml
+<ItemGroup>
+    <AssemblyMetadata Include="SUFeedURL" Value="https://sparkle-project.org/files/sparkletestcast.xml" />
+    <AssemblyMetadata Include="SUPublicEDKey" Value="pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=" />
+</ItemGroup>
+```
 
 #### macOS — add Sparkle keys to your `Info.plist`
 
