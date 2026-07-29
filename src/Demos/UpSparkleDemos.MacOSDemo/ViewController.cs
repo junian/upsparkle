@@ -20,10 +20,13 @@ public partial class ViewController : NSViewController {
 		base.ViewDidLoad ();
 
 		_updater = new UpSparkleUpdater();
-		_updater.Init(
+		_updater.Initialize(Assembly.GetExecutingAssembly());
+		/*
+		_updater.Initialize(
+			Assembly.GetExecutingAssembly(),
 			"https://sparkle-project.org/files/sparkletestcast.xml",
-			"MCwCFC9S9Yv8lzxX6BTMvR1/6K6O4sSVAhRNLAnl9jH+P86p5595B0vC+59L",
-			Assembly.GetExecutingAssembly());
+			"MCwCFC9S9Yv8lzxX6BTMvR1/6K6O4sSVAhRNLAnl9jH+P86p5595B0vC+59L");
+			*/
 
 		var checkUpdateButton = new NSButton
 		{

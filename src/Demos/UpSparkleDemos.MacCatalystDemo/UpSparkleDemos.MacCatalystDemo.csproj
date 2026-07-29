@@ -16,7 +16,17 @@
       To learn more, see: https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options#trimming-granularity
     -->
     <TrimMode Condition="'$(Configuration)' == 'Release'">full</TrimMode>
+
+    <Company>Junian.dev</Company>
+    <Product>Mac Catalyst Demo</Product>
+    <Version>0.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="SUFeedURL" Value="https://sparkle-project.org/files/sparkletestcast.xml" />
+    <AssemblyMetadata Include="SUPublicEDKey" Value="pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\UpSparkle\UpSparkle.csproj" />
   </ItemGroup>

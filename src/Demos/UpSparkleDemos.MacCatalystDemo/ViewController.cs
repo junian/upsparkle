@@ -52,10 +52,13 @@ public class ViewController : UIViewController
     {
         _updater = new UpSparkleUpdater();
         // Using dummy values for demo purposes
-        _updater.Init(
+        /*
+        _updater.Initialize(
+            Assembly.GetExecutingAssembly(),
             "https://sparkle-project.org/files/sparkletestcast.xml",
-            "dummy_public_key",
-            Assembly.GetExecutingAssembly());
+            "dummy_public_key");
+            */
+        _updater.Initialize(Assembly.GetExecutingAssembly());
     }
 
     public void DisposeUpdater()
