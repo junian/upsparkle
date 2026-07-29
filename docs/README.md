@@ -4,8 +4,9 @@
 
 Thin .NET wrapper around [WinSparkle](https://winsparkle.org) (Windows) and [Sparkle](https://sparkle-project.org) (macOS). One NuGet package, two platforms.
 
-[![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
-[![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
+[![NuGet](https://img.shields.io/nuget/v/UpSparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/UpSparkle/)
+[![NuGet](https://img.shields.io/nuget/dt/UpSparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/UpSparkle/)
+[![Buy me a coffee](https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-FFDD00?logo=buymeacoffee&style=for-the-badge "Buy me a coffee")](https://www.junian.dev/coffee/)
 
 </div>
 
@@ -21,13 +22,13 @@ UpSparkle gives .NET desktop apps a cross-platform auto-update UI without any pl
 ### 1. Install the NuGet package
 
 ```bash
-dotnet add package Upsparkle
+dotnet add package UpSparkle
 ```
 
 Or via Package Manager Console in Visual Studio:
 
 ```powershell
-Install-Package Upsparkle
+Install-Package UpSparkle
 ```
 
 ### 2. Configure your project
