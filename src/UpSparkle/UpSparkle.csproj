@@ -85,10 +85,18 @@
   </ItemGroup>
 
   <!-- Extract Sparkle.framework from Sparkle.tar.xz into the output directory.
-       Only runs on macOS. Skipped if Sparkle.framework already exists there. -->
+       Only runs on macOS, only during a normal build — skipped during dotnet pack.
+       Skipped if Sparkle.framework already exists in the output directory. -->
+  <Target Name="SetSkipSparkleExtractionForPack" BeforeTargets="Pack">
+    <PropertyGroup>
+      <SkipSparkleExtraction>true</SkipSparkleExtraction>
+    </PropertyGroup>
+  </Target>
+
   <Target Name="ExtractSparkleFramework"
           AfterTargets="Build"
-          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">
+          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'
+                     And '$(SkipSparkleExtraction)' != 'true'">
 
     <PropertyGroup>
       <_SparkleOutputDir>$(OutDir)runtimes/osx/native</_SparkleOutputDir>
