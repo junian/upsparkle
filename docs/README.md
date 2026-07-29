@@ -2,7 +2,7 @@
 
 # UpSparkle
 
-Thin wrapper of native updater framework for .NET desktop apps. It uses Sparkle for macOS and WinSparkle for Windows.
+Thin .NET wrapper around [WinSparkle](https://winsparkle.org) (Windows) and [Sparkle](https://sparkle-project.org) (macOS). One NuGet package, two platforms.
 
 [![NuGet](https://img.shields.io/nuget/v/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
 [![NuGet](https://img.shields.io/nuget/dt/Upsparkle.svg?style=for-the-badge)](https://www.nuget.org/packages/Upsparkle/)
@@ -11,10 +11,12 @@ Thin wrapper of native updater framework for .NET desktop apps. It uses Sparkle 
 
 ## About
 
-Cross-platform updater for .NET desktop apps. This library ships as a single NuGet package and uses platform-specific native implementations under the hood:
+UpSparkle gives .NET desktop apps a cross-platform auto-update UI without any platform-specific plumbing code. It ships a single `netstandard2.0` NuGet package that automatically picks the right native binary at runtime.
 
-- On Windows, via wrapping [WinSparkle](https://winsparkle.org).
-- On macOS, via wrapping [Sparkle](https://sparkle-project.org).
+- **Windows** — wraps [WinSparkle](https://winsparkle.org)
+- **macOS / Mac Catalyst** — wraps [Sparkle](https://sparkle-project.org)
+
+---
 
 ## Quickstart
 
@@ -24,44 +26,61 @@ Cross-platform updater for .NET desktop apps. This library ships as a single NuG
 dotnet add package Upsparkle
 ```
 
-Or via the Package Manager Console in Visual Studio:
+Or via Package Manager Console in Visual Studio:
 
 ```powershell
 Install-Package Upsparkle
 ```
 
+---
+
 ### 2. Configure your project
 
-The `Init` call reads your app's metadata from the executing assembly, so make sure the relevant fields are populated before calling it.
+`Initialize` reads your app's metadata from the executing assembly, so you need to set those values in your project first.
 
-#### Windows — set assembly metadata in your `.csproj`
+#### Windows — SDK-style project (`.csproj`)
+
+Add company, product, and version to your `<PropertyGroup>`, then declare the UpSparkle-specific metadata in an `<ItemGroup>`:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <!-- ... -->
-        <!-- other properties here -->
-        <!-- ... -->
+  <PropertyGroup>
+    <Company>Wayne Enterprise</Company>
+    <Product>BatComputer App</Product>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
 
-        <Company>Wayne Enterprise</Company>
-        <Product>BatComputer App</Product>
-        <Version>1.0.0</Version>
-    </PropertyGroup>
+  <ItemGroup>
+    <!-- Required: URL of your appcast XML feed -->
+    <AssemblyMetadata Include="SUFeedURL" Value="https://example.com/appcast.xml" />
+    <!-- Required: Base64-encoded EdDSA public key for verifying update signatures -->
+    <AssemblyMetadata Include="SUPublicEDKey" Value="<your-base64-eddsa-public-key>" />
+  </ItemGroup>
 </Project>
 ```
 
-These map to `AssemblyCompanyAttribute`, `AssemblyProductAttribute`, and `AssemblyInformationalVersionAttribute` respectively, which UpSparkle reads at runtime.
+These map to `AssemblyCompanyAttribute`, `AssemblyProductAttribute`, `AssemblyInformationalVersionAttribute`, and `AssemblyMetadataAttribute` respectively — all of which `Initialize` reads at runtime.
 
-Add this metadata below `PropertyGroup`:
+#### Windows — classic .NET Framework project (`AssemblyInfo.cs`)
 
-```xml
-<ItemGroup>
-    <AssemblyMetadata Include="SUFeedURL" Value="https://sparkle-project.org/files/sparkletestcast.xml" />
-    <AssemblyMetadata Include="SUPublicEDKey" Value="pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=" />
-</ItemGroup>
+For non-SDK-style projects (e.g. .NET Framework 4.6.2 targeting `net462` without `<Project Sdk="...">`), the `<ItemGroup>/<AssemblyMetadata>` shorthand is not available. Add the attributes directly to your `Properties\AssemblyInfo.cs` instead:
+
+```csharp
+using System.Reflection;
+
+// Standard assembly identity attributes
+[assembly: AssemblyCompany("Wayne Enterprise")]
+[assembly: AssemblyProduct("BatComputer App")]
+[assembly: AssemblyInformationalVersion("1.0.0")]
+
+// UpSparkle-specific metadata
+[assembly: AssemblyMetadata("SUFeedURL", "https://example.com/appcast.xml")]
+[assembly: AssemblyMetadata("SUPublicEDKey", "<your-base64-eddsa-public-key>")]
 ```
 
-#### macOS — add Sparkle keys to your `Info.plist`
+> `AssemblyMetadata` is in `System.Reflection` and is available in .NET Framework 4.5+.
+
+#### macOS — `Info.plist`
 
 On macOS, Sparkle reads its configuration directly from the app bundle's `Info.plist`. At minimum you need:
 
@@ -72,58 +91,82 @@ On macOS, Sparkle reads its configuration directly from the app bundle's `Info.p
 
 <!-- Required: EdDSA public key for verifying update signatures -->
 <key>SUPublicEDKey</key>
-<string>pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=</string>
+<string><your-base64-eddsa-public-key></string>
 ```
 
-A few commonly used optional keys:
+Commonly used optional keys:
 
 ```xml
-<!-- Skip the "can we check automatically?" permission prompt on second launch -->
+<!-- Skip the automatic-check permission prompt on second launch -->
 <key>SUEnableAutomaticChecks</key>
 <true/>
 
-<!-- How often to check for updates, in seconds (default: 86400 = 1 day) -->
+<!-- How often to poll for updates, in seconds (default: 86400 = 1 day) -->
 <key>SUScheduledCheckInterval</key>
 <integer>86400</integer>
 
-<!-- Silently download and install updates in the background (default: NO) -->
+<!-- Silently download and install in the background -->
 <key>SUAutomaticallyUpdate</key>
 <false/>
 
-<!-- Hide release notes in the update alert (default: YES = shown) -->
+<!-- Show release notes in the update alert -->
 <key>SUShowReleaseNotes</key>
 <true/>
 ```
 
-For the full list of supported keys — including security, sandboxing, and system profiling options — see the [Sparkle customization docs](https://sparkle-project.org/documentation/customization/).
+For the full list of supported keys see the [Sparkle customization docs](https://sparkle-project.org/documentation/customization/).
 
 To generate your EdDSA key pair, use the `generate_keys` tool that ships with Sparkle. See the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) for step-by-step instructions.
 
+---
+
 ### 3. Initialize the updater
 
-Create an `UpSparkleUpdater` instance once (typically at app startup) and call `Init` with your appcast URL, your EdDSA public key, and the executing assembly:
+Create one `UpSparkleUpdater` instance per application (typically at startup) and call `Initialize`. The simplest form reads everything from the executing assembly:
 
 ```csharp
 using UpSparkle;
 
-// Create the updater (do this once, e.g. in your main window or app startup)
 var updater = new UpSparkleUpdater();
 
-updater.Init(
-    appCastUrl:   "https://example.com/appcast.xml",
-    publicKey:    "<your-base64-eddsa-public-key>",
-    assemblyInfo: System.Reflection.Assembly.GetExecutingAssembly());
+// Reads SUFeedURL and SUPublicEDKey from AssemblyMetadata,
+// and company/product/version from standard assembly attributes.
+updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
 ```
 
-`Init` reads the company name, product name, and version directly from the assembly attributes set in step 2, so you don't need to repeat them in code.
+You can also pass the appcast URL and/or public key directly — they take precedence over the assembly metadata:
+
+```csharp
+updater.Initialize(
+    assemblyInfo:   System.Reflection.Assembly.GetExecutingAssembly(),
+    appcastUrl:     "https://example.com/appcast.xml",
+    edDSAPublicKey: "<your-base64-eddsa-public-key>");
+```
+
+After a successful call, the following properties are available:
+
+| Property | Description |
+|---|---|
+| `IsInitialized` | `true` once `Initialize` has succeeded |
+| `AppcastUrl` | The resolved appcast feed URL |
+| `EdDSAPublicKey` | The resolved EdDSA public key |
+| `CompanyName` | Resolved from `AssemblyCompanyAttribute` |
+| `AppName` | Resolved from `AssemblyProductAttribute` |
+| `AppVersion` | Resolved from `AssemblyInformationalVersionAttribute` (build metadata suffix stripped) |
+
+---
 
 ### 4. Check for updates
 
-Trigger the native update UI — for example, from a menu item or button:
+Call `CheckUpdateWithUI()` to open the native update dialog — wire this to a menu item, toolbar button, or call it automatically on startup:
 
 ```csharp
 updater.CheckUpdateWithUI();
 ```
+
+> `CheckUpdateWithUI` throws `InvalidOperationException` if called before `Initialize`.
+
+---
 
 ### 5. Clean up on exit
 
@@ -133,7 +176,13 @@ Dispose the updater when the application closes to release native resources:
 updater.Dispose();
 ```
 
-### Full WPF example
+After disposal, `IsInitialized` is reset to `false`.
+
+---
+
+## Full Examples
+
+### WPF
 
 ```csharp
 using System.Windows;
@@ -145,10 +194,7 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        _updater.Init(
-            appCastUrl:   "https://example.com/appcast.xml",
-            publicKey:    "<your-base64-eddsa-public-key>",
-            assemblyInfo: System.Reflection.Assembly.GetExecutingAssembly());
+        _updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
     }
 
     private void CheckForUpdates_Click(object sender, RoutedEventArgs e)
@@ -163,76 +209,205 @@ public partial class MainWindow : Window
 }
 ```
 
+### WinForms
+
+```csharp
+using System.Windows.Forms;
+using UpSparkle;
+
+public partial class Form1 : Form
+{
+    private readonly UpSparkleUpdater _updater = new UpSparkleUpdater();
+
+    private void Form1_Load(object sender, EventArgs e)
+    {
+        _updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
+    }
+
+    private void btnCheckUpdate_Click(object sender, EventArgs e)
+    {
+        _updater.CheckUpdateWithUI();
+    }
+
+    private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        _updater.Dispose();
+    }
+}
+```
+
+### Avalonia (MVVM)
+
+```csharp
+using System.Reflection;
+using UpSparkle;
+
+public partial class MainWindowViewModel : ViewModelBase
+{
+    private readonly UpSparkleUpdater _updater = new UpSparkleUpdater();
+
+    public void Init()
+    {
+        _updater.Initialize(Assembly.GetExecutingAssembly());
+
+        // Properties are populated after Initialize
+        Console.WriteLine(_updater.CompanyName);
+        Console.WriteLine(_updater.AppName);
+        Console.WriteLine(_updater.AppVersion);
+    }
+
+    public void CheckForUpdates()
+    {
+        _updater.CheckUpdateWithUI();
+    }
+}
+```
+
+### MAUI
+
+```csharp
+using System.Reflection;
+using UpSparkle;
+
+public partial class MainPage : ContentPage
+{
+    private readonly UpSparkleUpdater _updater = new UpSparkleUpdater();
+
+    public MainPage()
+    {
+        InitializeComponent();
+
+        this.Loaded += (_, _) =>
+            _updater.Initialize(Assembly.GetExecutingAssembly());
+
+        this.Disappearing += (_, _) =>
+            _updater.Dispose();
+    }
+
+    private void OnCheckUpdatesClicked(object sender, EventArgs e)
+    {
+        _updater.CheckUpdateWithUI();
+    }
+}
+```
+
+---
+
+## API Reference
+
+### `UpSparkleUpdater`
+
+```csharp
+public class UpSparkleUpdater : IDisposable
+```
+
+#### Constructor
+
+```csharp
+new UpSparkleUpdater()
+```
+
+Creates a new updater instance. The native backend is not started until `Initialize` is called.
+
+#### Methods
+
+```csharp
+void Initialize(Assembly assemblyInfo, string appcastUrl = null, string edDSAPublicKey = null)
+```
+
+Starts the native Sparkle / WinSparkle framework. Reads company name, app name, and version from the assembly's standard attributes. `appcastUrl` and `edDSAPublicKey` are resolved from parameters first, then from `AssemblyMetadata` entries with keys `"SUFeedURL"` and `"SUPublicEDKey"` respectively.
+
+Throws `ArgumentNullException` if `assemblyInfo` is null. Throws `ArgumentException` if a required value cannot be resolved.
+
+---
+
+```csharp
+void CheckUpdateWithUI()
+```
+
+Opens the native update UI. Throws `InvalidOperationException` if called before `Initialize`.
+
+---
+
+```csharp
+void Dispose()
+```
+
+Shuts down the native updater and releases native resources. Resets `IsInitialized` to `false`.
+
+#### Properties
+
+```csharp
+bool IsInitialized { get; }
+string AppcastUrl { get; }
+string EdDSAPublicKey { get; }
+string CompanyName { get; }
+string AppName { get; }
+string AppVersion { get; }
+```
+
+All properties return `null` before `Initialize` is called.
+
+#### Constants
+
+```csharp
+const string AppcastUrlMetadataKey = "SUFeedURL";
+const string EdDSAPublicKeyMetadataKey = "SUPublicEDKey";
+```
+
+Keys used to look up `AssemblyMetadata` values from the assembly. Match the corresponding `Info.plist` keys on macOS.
+
+---
+
 ## Supported Platforms
 
-For macOS or Mac Catalyst:
+| Platform | Minimum version |
+|---|---|
+| Windows (x86 / x64 / Arm64) | .NET Framework 4.6.2, or .NET 6+ |
+| macOS (Apple Silicon / Intel) | .NET 6+ |
+| Mac Catalyst (Apple Silicon / Intel) | .NET 6+ |
 
-- `net6.0` or later
-- `net6.0-macos` or later
-- `net6.0-maccatalyst` or later
+Tested project types:
 
-For Windows:
+**Windows** — WinForms, WPF, WinUI, Avalonia UI, MAUI (WinUI)
 
-- `net462` (.NET Framework 4.6.2) or later
-- `net6.0` or later
-- `net6.0-windows` or later
+**macOS** — .NET macOS, MAUI (Mac Catalyst), Avalonia UI, Uno Platform
 
-Currently, this library supports the following platforms:
+---
 
-1. macOS (Apple Silicon and Intel)
-2. Mac Catalyst (Apple Silicon and Intel)
-3. Windows 10 and 11 (Arm64, x64, and x86)
+## Appcast & Signing
 
-Tested with the following .NET project types:
+UpSparkle requires an [appcast XML feed](https://sparkle-project.org/documentation/publishing/) hosted at a public URL. Every update package must be signed with an EdDSA key pair.
 
-### Windows
+Generate your keys with the `generate_keys` tool that ships with Sparkle, then follow the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) to sign your releases.
 
-Works with .NET Framework 4.6.2 or later and modern .NET:
-
-- WinForms
-- WPF
-- WinUI
-- AvaloniaUI
-- MAUI (WinUI)
-
-### macOS
-
-Works with modern .NET only:
-
-- .NET macOS
-- MAUI (Mac Catalyst)
-- Avalonia UI
-- Uno Platform
-
-## Appcast & Public Key
-
-UpSparkle requires an [appcast XML file](https://sparkle-project.org/documentation/publishing/) hosted at a public URL. Updates must be signed with an EdDSA key pair — use the `generate_keys` tool that ships with Sparkle and follow the [EdDSA signatures guide](https://sparkle-project.org/documentation/eddsa-signatures/) to generate your keys and sign your releases.
+---
 
 ## Development
 
-Before starting development, install 3rd-party dependencies by running the appropriate script for your platform.
+Before starting development, fetch the native dependencies by running the script for your platform.
 
 **macOS / Linux**
 
 ```bash
-$ ./getlibs.sh
+./getlibs.sh
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-PS> .\Get-Libraries.ps1
+.\Get-Libraries.ps1
 ```
 
-Both scripts download and extract files based on `.gitbinmodules` content and place them under the `libs` directory.
+Both scripts download and extract binaries based on `.gitbinmodules` into the `libs` directory. To use a different version of Sparkle or WinSparkle, edit `.gitbinmodules` and re-run the script.
 
-To use a different version of Sparkle or WinSparkle binaries, edit `.gitbinmodules` and update the desired version.
+---
 
 ## Credits
 
-- [sparkle-project/Sparkle](https://github.com/sparkle-project/Sparkle) for the macOS native framework.
-- [vslavik/winsparkle](https://github.com/vslavik/winsparkle) for the Windows native implementation.
+- [sparkle-project/Sparkle](https://github.com/sparkle-project/Sparkle) — macOS native framework
+- [vslavik/winsparkle](https://github.com/vslavik/winsparkle) — Windows native implementation
 
 ## License
 
-This project is licensed under the [MIT License](https://github.com/junian/upsparkle/blob/master/LICENSE).
+[MIT License](https://github.com/junian/upsparkle/blob/master/LICENSE)
