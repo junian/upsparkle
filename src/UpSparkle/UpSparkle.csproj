@@ -56,14 +56,26 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <!-- Sparkle.framework (macOS) -->
+  <!-- Sparkle (macOS) -->
   <ItemGroup>
-    <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
+    <!-- Sparkle.tar.xz: packed into the NuGet as runtimes/osx/native/Sparkle.tar.xz.
+         Never copied to the output directory — extraction happens at build time on macOS
+         via the ExtractSparkleFramework target below. -->
+    <None Include="..\..\runtimes\osx\native\Sparkle.tar.xz"
           Pack="true"
-          PackagePath="runtimes/osx/native/Sparkle.framework/%(RecursiveDir)%(Filename)%(Extension)">
+          PackagePath="runtimes/osx/native/Sparkle.tar.xz"
+          CopyToOutputDirectory="Never" />
+
+    <!-- Sparkle.framework: present locally after running getlibs.sh / Get-Libraries.ps1.
+         Used by the macOS build and for local development/testing.
+         Never packed into NuGet (symlinks would be corrupted by ZIP).
+         Never copied to output — the post-build target below handles that. -->
+    <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
+          Pack="false"
+          CopyToOutputDirectory="Never">
       <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+
     <None Include="..\..\runtimes\osx\native\libMacSparkle.dylib"
           Pack="true"
           PackagePath="runtimes/osx/native/libMacSparkle.dylib">
@@ -71,6 +83,36 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <!-- Extract Sparkle.framework from Sparkle.tar.xz into the output directory.
+       Only runs on macOS. Skipped if Sparkle.framework already exists there. -->
+  <Target Name="ExtractSparkleFramework"
+          AfterTargets="Build"
+          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">
+
+    <PropertyGroup>
+      <_SparkleOutputDir>$(OutDir)runtimes/osx/native</_SparkleOutputDir>
+      <_SparkleFrameworkDir>$(_SparkleOutputDir)/Sparkle.framework</_SparkleFrameworkDir>
+      <_SparkleTarXz>$(MSBuildProjectDirectory)/../../runtimes/osx/native/Sparkle.tar.xz</_SparkleTarXz>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_SparkleOutputDir)"
+             Condition="!Exists('$(_SparkleOutputDir)')" />
+
+    <Message Text="Sparkle.framework already present at $(_SparkleFrameworkDir), skipping extraction."
+             Importance="normal"
+             Condition="Exists('$(_SparkleFrameworkDir)')" />
+
+    <Exec Command="tar -xJf &quot;$(_SparkleTarXz)&quot; -C &quot;$(_SparkleOutputDir)&quot;"
+          Condition="!Exists('$(_SparkleFrameworkDir)') And Exists('$(_SparkleTarXz)')" />
+
+    <Message Text="Extracted Sparkle.framework to $(_SparkleFrameworkDir)."
+             Importance="high"
+             Condition="!Exists('$(_SparkleFrameworkDir)') And Exists('$(_SparkleTarXz)')" />
+
+    <Warning Text="Sparkle.tar.xz not found at $(_SparkleTarXz). Run getlibs.sh to fetch native dependencies."
+             Condition="!Exists('$(_SparkleFrameworkDir)') And !Exists('$(_SparkleTarXz)')" />
+  </Target>
 
   <!-- WinSparkle (Windows) -->
   <ItemGroup>

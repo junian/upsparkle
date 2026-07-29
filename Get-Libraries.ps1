@@ -21,7 +21,7 @@ $ModulesFile = Join-Path $PSScriptRoot ".gitbinmodules"
 $Urls = Get-Content $ModulesFile | Where-Object { $_.Trim() -ne "" }
 
 if (-not $IncludeSparkle) {
-    $Urls = $Urls | Where-Object { $_ -match "WinSparkle" }
+    $Urls = $Urls | Where-Object { $_ -notmatch "Sparkle" }
 }
 
 Write-Host "Downloading files ..."
@@ -36,17 +36,28 @@ foreach ($Url in $Urls) {
 Write-Host "Download finished."
 Write-Host "Extracting files ..."
 
-# --- Sparkle (tar.xz) -> runtimes/osx/native/ ---
+# --- Sparkle (tar.xz) ---
+# Extracts Sparkle.framework to runtimes/osx/native/ for local development.
+# Renames the versioned archive to the fixed name Sparkle.tar.xz so the
+# csproj can reference it as a NuGet asset without a wildcard.
 if ($IncludeSparkle) {
     $OsxNativeDir = Join-Path $RuntimesDir "osx\native"
     New-Item -ItemType Directory -Path $OsxNativeDir -Force | Out-Null
 
     $SparkleArchive = Get-ChildItem -Path $LibsDir -Filter "Sparkle*.tar.xz" | Select-Object -First 1
     if ($SparkleArchive) {
-        Write-Host "Extracting $($SparkleArchive.Name) -> runtimes/osx/native/ ..."
+        Write-Host "Extracting $($SparkleArchive.Name) -> runtimes/osx/native/Sparkle.framework ..."
         tar -xJf $SparkleArchive.FullName -C $LibsDir
-        Move-Item (Join-Path $LibsDir "Sparkle.framework") (Join-Path $OsxNativeDir "Sparkle.framework") -Force
-        Remove-Item $SparkleArchive.FullName
+        $FrameworkSrc = Join-Path $LibsDir "Sparkle.framework"
+        if (Test-Path $FrameworkSrc) {
+            Move-Item $FrameworkSrc (Join-Path $OsxNativeDir "Sparkle.framework") -Force
+            Write-Host "  -> runtimes/osx/native/Sparkle.framework"
+        }
+
+        # Rename versioned archive to fixed name for NuGet packaging.
+        $FixedArchivePath = Join-Path $OsxNativeDir "Sparkle.tar.xz"
+        Move-Item $SparkleArchive.FullName $FixedArchivePath -Force
+        Write-Host "  -> runtimes/osx/native/Sparkle.tar.xz"
     }
 
     # --- libMacSparkle (zip) -> runtimes/osx/native/libMacSparkle.dylib ---

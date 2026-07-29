@@ -15,8 +15,13 @@ echo "Extracting Sparkle ..."
 
 mkdir -p "${RUNTIMES_DIR}/osx/native"
 tar -Jxf libs/Sparkle*.tar.xz -C "libs"
-mv libs/Sparkle.framework -C "${RUNTIMES_DIR}/osx/native/."
-rm libs/Sparkle*.tar.xz
+mv libs/Sparkle.framework "${RUNTIMES_DIR}/osx/native/."
+
+# Rename versioned archive to a fixed name so the csproj can reference it directly.
+SPARKLE_ARCHIVE=$(ls libs/Sparkle*.tar.xz 2>/dev/null | head -n 1)
+if [ -n "$SPARKLE_ARCHIVE" ]; then
+    mv "$SPARKLE_ARCHIVE" "${RUNTIMES_DIR}/osx/native/Sparkle.tar.xz"
+fi
 
 echo "Extracting MacSparkle ..."
 
