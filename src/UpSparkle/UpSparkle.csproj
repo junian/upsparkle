@@ -35,7 +35,7 @@
     <CLSCompliant>True</CLSCompliant>
     
     <!-- Versions -->
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <PackageVersion>$(AssemblyVersion)-alpha</PackageVersion>
     <ReleaseVersion>$(AssemblyVersion)</ReleaseVersion>
     <Version>$(AssemblyVersion)</Version>
@@ -46,7 +46,9 @@
     <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
     <None Include="..\..\docs\README.md" Pack="true" PackagePath="\" />
     <!-- MSBuild targets file: imported by consuming projects automatically. -->
-    <None Include="build\UpSparkle.targets" Pack="true" PackagePath="build\UpSparkle.targets" />
+    <None Include="build\UpSparkle.targets"
+        Pack="true"
+        PackagePath="build\UpSparkle.targets" />
     <!--
     <None Include="..\..\assets\img\standard-licensing-logo.png" Pack="true" PackagePath="\" />
     -->
@@ -66,19 +68,21 @@
          via the build/UpSparkle.targets file (imported by consuming projects). -->
     <None Include="..\..\runtimes\osx\native\Sparkle.tar.xz"
           Pack="true"
-          PackagePath="runtimes/osx/native/Sparkle.tar.xz"
+          PackagePath="build/Sparkle.tar.xz"
+          Link="build/Sparkle.tar.xz"
           CopyToOutputDirectory="Never" />
 
+    
     <!-- Sparkle.framework: present locally after running getlibs.sh / Get-Libraries.ps1.
          Used by the macOS build and for local development/testing of UpSparkle itself.
          Never packed into NuGet (symlinks would be corrupted by ZIP).
          Copied to output during local dev builds via the Import below. -->
     <None Include="..\..\runtimes\osx\native\Sparkle.framework\**"
           Pack="false"
-          CopyToOutputDirectory="Never">
+          CopyToOutputDirectory="PreserveNewest">
       <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </None>
-
+    
     <None Include="..\..\runtimes\osx\native\libMacSparkle.dylib"
           Pack="true"
           PackagePath="runtimes/osx/native/libMacSparkle.dylib">

@@ -1,93 +1,25 @@
 <Project>
 
-  <!--
-    UpSparkle MSBuild targets
-    =========================
-    These targets run in the *consuming* project on macOS only.
+  <PropertyGroup>
+    <_SparkleArchive>$(MSBuildThisFileDirectory)Sparkle.tar.xz</_SparkleArchive>
+    <_SparkleRoot>$(IntermediateOutputPath)UpSparkle</_SparkleRoot>
+    <_SparkleFramework>$(_SparkleRoot)\Sparkle.framework</_SparkleFramework>
+  </PropertyGroup>
 
-    1. UpSparkle_ExtractSparkleFramework  (AfterTargets="ResolveReferences")
-       Extracts Sparkle.framework from Sparkle.tar.xz (bundled in the NuGet package)
-       into a staging directory under $(IntermediateOutputPath), preserving symlinks.
-       Skipped when already extracted or when packing.
+  <Target Name="UpSparkleExtractSparkle"
+          BeforeTargets="ResolveReferences"
+          Condition="'$(OS)' == 'Unix' and Exists('$(_SparkleArchive)')">
 
-    2. UpSparkle_AddSparkleNativeFramework  (AfterTargets="UpSparkle_ExtractSparkleFramework")
-       Adds the extracted Sparkle.framework to the @(NativeFramework) item group so
-       the .NET macOS SDK copies it into the app bundle's Contents/Frameworks/ folder
-       during build and publish.
-  -->
+    <MakeDir Directories="$(_SparkleRoot)" />
 
-  <!-- =========================================================== -->
-  <!-- Opt-out: set SkipSparkleExtraction=true during dotnet pack  -->
-  <!-- =========================================================== -->
+    <Exec Command="tar -xJf &quot;$(_SparkleArchive)&quot; -C &quot;$(_SparkleRoot)&quot;" />
 
-  <Target Name="UpSparkle_SetSkipForPack" BeforeTargets="Pack">
-    <PropertyGroup>
-      <SkipSparkleExtraction>true</SkipSparkleExtraction>
-    </PropertyGroup>
-  </Target>
-
-  <!-- =========================================================== -->
-  <!-- Step 1: extract Sparkle.framework into the staging dir      -->
-  <!-- =========================================================== -->
-
-  <Target Name="UpSparkle_ExtractSparkleFramework"
-          AfterTargets="ResolveReferences"
-          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'
-                     And '$(SkipSparkleExtraction)' != 'true'">
-
-    <!--
-      $(MSBuildThisFileDirectory) = <package-cache>/upsparkle/<ver>/build/
-      Sparkle.tar.xz is at      = <package-cache>/upsparkle/<ver>/runtimes/osx/native/Sparkle.tar.xz
-      We stage into IntermediateOutputPath so the framework is available to the
-      NativeFramework item group before the app bundle is assembled.
-    -->
-    <PropertyGroup>
-      <_UpSparkle_PackageRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../'))</_UpSparkle_PackageRoot>
-      <_UpSparkle_TarXz>$(_UpSparkle_PackageRoot)runtimes/osx/native/Sparkle.tar.xz</_UpSparkle_TarXz>
-      <_UpSparkle_StagingDir>$(IntermediateOutputPath)upsparkle/osx/native</_UpSparkle_StagingDir>
-      <_UpSparkle_FrameworkDir>$(_UpSparkle_StagingDir)/Sparkle.framework</_UpSparkle_FrameworkDir>
-    </PropertyGroup>
-
-    <MakeDir Directories="$(_UpSparkle_StagingDir)"
-             Condition="!Exists('$(_UpSparkle_StagingDir)')" />
-
-    <Message Text="[UpSparkle] Sparkle.framework already staged at $(_UpSparkle_FrameworkDir), skipping extraction."
-             Importance="normal"
-             Condition="Exists('$(_UpSparkle_FrameworkDir)')" />
-
-    <Exec Command="tar -xJf &quot;$(_UpSparkle_TarXz)&quot; -C &quot;$(_UpSparkle_StagingDir)&quot;"
-          Condition="!Exists('$(_UpSparkle_FrameworkDir)') And Exists('$(_UpSparkle_TarXz)')" />
-
-    <Message Text="[UpSparkle] Extracted Sparkle.framework to $(_UpSparkle_FrameworkDir)."
-             Importance="high"
-             Condition="Exists('$(_UpSparkle_FrameworkDir)')" />
-
-    <Warning Text="[UpSparkle] Sparkle.tar.xz not found at $(_UpSparkle_TarXz). The NuGet package may be corrupt or incomplete."
-             Condition="!Exists('$(_UpSparkle_FrameworkDir)') And !Exists('$(_UpSparkle_TarXz)')" />
-
-  </Target>
-
-  <!-- =========================================================== -->
-  <!-- Step 2: register with NativeFramework so the SDK bundles it -->
-  <!-- =========================================================== -->
-
-  <Target Name="UpSparkle_AddSparkleNativeFramework"
-          AfterTargets="UpSparkle_ExtractSparkleFramework"
-          Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'
-                     And '$(SkipSparkleExtraction)' != 'true'">
-
-    <PropertyGroup>
-      <_UpSparkle_StagingDir>$(IntermediateOutputPath)upsparkle/osx/native</_UpSparkle_StagingDir>
-      <_UpSparkle_FrameworkDir>$(_UpSparkle_StagingDir)/Sparkle.framework</_UpSparkle_FrameworkDir>
-    </PropertyGroup>
-
-    <ItemGroup Condition="Exists('$(_UpSparkle_FrameworkDir)')">
-      <NativeFramework Include="$(_UpSparkle_FrameworkDir)" />
+    <ItemGroup>
+      <None Include="$(_SparkleFramework)\**">
+        <Link>runtimes\osx\native\Sparkle.framework\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
-
-    <Message Text="[UpSparkle] Registered Sparkle.framework as NativeFramework for app bundle inclusion."
-             Importance="normal"
-             Condition="Exists('$(_UpSparkle_FrameworkDir)')" />
 
   </Target>
 
