@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-07-29
+## [1.0.6] - 2026-07-30
 
 ### Added
 
@@ -28,9 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated project, package, and assembly versioning for the stable `1.0.6` release.
+- Refined Sparkle framework extraction and macOS app bundle integration for smoother runtime packaging.
+- Improved NuGet packaging metadata and build asset handling for runtime-native Sparkle/WinSparkle assets.
+- Ensured package release notes are sourced from `ReleaseNotes.txt` for NuGet distribution.
 - Consolidated previously separate `UpSparkle.Mac` and `UpSparkle.Windows` projects into a single `netstandard2.0` library with runtime-conditional platform dispatch.
 - Native initialization refactored into discrete configuration steps (`SetAppDetails`, `SetAppcastUrl`, `SetEdDSAPublicKey`, `Initialize`) to align both backends behind a clean `INativeSparkle` interface.
 - Native library loading moved to a dynamic `LoadLibrary` / `dlopen` approach, replacing static `[DllImport]` declarations, to support the NuGet `runtimes/` layout without requiring a build-time reference.
 - `runtimes/` directory structure adopted to follow standard .NET NuGet native-asset conventions.
 
-[1.0.0]: https://github.com/junian/upsparkle/releases/tag/v1.0.0
+[1.0.6]: https://github.com/junian/upsparkle/releases/tag/v1.0.6

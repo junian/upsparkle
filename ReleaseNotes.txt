@@ -1,4 +1,4 @@
-UpSparkle 1.0.0 - 2026-07-29
+UpSparkle 1.0.6.0 - 2026-07-30
 
 Added
 
@@ -20,6 +20,8 @@ Added
 
 Changed
 
+- Refined Sparkle framework extraction and macOS app bundle integration.
+- Improved NuGet build metadata and runtime asset packaging for Sparkle/WinSparkle.
 - Merged the old UpSparkle.Mac and UpSparkle.Windows projects into a single library with
   runtime platform dispatch.
 - Switched native loading from static DllImport to dynamic LoadLibrary/dlopen to support
