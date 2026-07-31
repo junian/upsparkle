@@ -144,6 +144,11 @@ namespace UpSparkle
         /// <see langword="null"/> or empty, the value is resolved from an
         /// <see cref="AssemblyMetadataAttribute"/> with key <c>"SUPublicEDKey"</c> embedded
         /// in <paramref name="assemblyInfo"/>.
+        /// <para>
+        /// Note: passing <paramref name="edDSAPublicKey"/> only works on Windows
+        /// (WinSparkle). On macOS (Sparkle) it is ignored; use the <c>"SUPublicEDKey"</c>
+        /// metadata key instead, which works on both platforms.
+        /// </para>
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="assemblyInfo"/> is <see langword="null"/>.
@@ -161,7 +166,10 @@ namespace UpSparkle
             if (string.IsNullOrWhiteSpace(appcastUrl))
                 appcastUrl = GetAssemblyMetadata(assemblyInfo, UpSparkleSettings.SUFeedURL);
 
-            // Resolve EdDSA public key: parameter → assembly metadata fallback
+            // Resolve EdDSA public key: parameter → assembly metadata fallback.
+            // Note: setting edDSAPublicKey via the parameter only works on Windows
+            // (WinSparkle); on macOS (Sparkle) it is ignored. Prefer embedding the key
+            // as SUPublicEDKey assembly metadata instead.
             if (string.IsNullOrWhiteSpace(edDSAPublicKey))
                 edDSAPublicKey = GetAssemblyMetadata(assemblyInfo, UpSparkleSettings.SUPublicEDKey);
 
