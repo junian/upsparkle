@@ -339,6 +339,58 @@ public sealed class UpSparkleUpdaterTests
     }
 
     // -------------------------------------------------------------------------
+    // Automatic update configuration properties
+    // -------------------------------------------------------------------------
+
+    [TestMethod]
+    public void IsAutomaticCheckForUpdates_DefaultsToFalse()
+    {
+        var fake = new FakeNativeSparkle();
+        Assert.IsFalse(fake.IsAutomaticCheckForUpdates);
+    }
+
+    [TestMethod]
+    public void IsAutomaticCheckForUpdates_CanBeSetAndRead()
+    {
+        var fake = new FakeNativeSparkle();
+
+        fake.IsAutomaticCheckForUpdates = true;
+        Assert.IsTrue(fake.IsAutomaticCheckForUpdates);
+
+        fake.IsAutomaticCheckForUpdates = false;
+        Assert.IsFalse(fake.IsAutomaticCheckForUpdates);
+    }
+
+    [TestMethod]
+    public void UpdateCheckInterval_CanBeSetAndRead()
+    {
+        var fake = new FakeNativeSparkle();
+
+        fake.UpdateCheckInterval = 86400;
+        Assert.AreEqual(86400, fake.UpdateCheckInterval);
+
+        fake.UpdateCheckInterval = 3600;
+        Assert.AreEqual(3600, fake.UpdateCheckInterval);
+    }
+
+    [TestMethod]
+    public void LastCheckTime_DefaultsToNull()
+    {
+        var fake = new FakeNativeSparkle();
+        Assert.IsNull(fake.LastCheckTime);
+    }
+
+    [TestMethod]
+    public void LastCheckTime_CanBeSetAndRead()
+    {
+        var fake = new FakeNativeSparkle();
+        var lastCheckTime = new DateTime(2026, 7, 31, 12, 0, 0, DateTimeKind.Utc);
+
+        fake.LastCheckTime = lastCheckTime;
+        Assert.AreEqual(lastCheckTime, fake.LastCheckTime);
+    }
+
+    // -------------------------------------------------------------------------
     // Dispose
     // -------------------------------------------------------------------------
 

@@ -40,10 +40,31 @@ namespace UpSparkle.Natives
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void mac_sparkle_check_update_with_ui_delegate();
 
-        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void mac_sparkle_set_automatic_check_for_updates_delegate(int state);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int mac_sparkle_get_automatic_check_for_updates_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void mac_sparkle_set_update_check_interval_delegate(int interval);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int mac_sparkle_get_update_check_interval_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate long mac_sparkle_get_last_check_time_delegate();
+
         private static readonly mac_sparkle_set_appcast_url_delegate mac_sparkle_set_appcast_url;
         private static readonly mac_sparkle_init_delegate mac_sparkle_init;
         private static readonly mac_sparkle_check_update_with_ui_delegate mac_sparkle_check_update_with_ui;
+        private static readonly mac_sparkle_set_automatic_check_for_updates_delegate mac_sparkle_set_automatic_check_for_updates;
+        private static readonly mac_sparkle_get_automatic_check_for_updates_delegate mac_sparkle_get_automatic_check_for_updates;
+        private static readonly mac_sparkle_set_update_check_interval_delegate mac_sparkle_set_update_check_interval;
+        private static readonly mac_sparkle_get_update_check_interval_delegate mac_sparkle_get_update_check_interval;
+        private static readonly mac_sparkle_get_last_check_time_delegate mac_sparkle_get_last_check_time;
+
+        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
         /// Loads <c>libMacSparkle.dylib</c> and resolves all required native function pointers.
@@ -67,6 +88,11 @@ namespace UpSparkle.Natives
             mac_sparkle_set_appcast_url = GetDelegate<mac_sparkle_set_appcast_url_delegate>(handle, nameof(mac_sparkle_set_appcast_url));
             mac_sparkle_init = GetDelegate<mac_sparkle_init_delegate>(handle, nameof(mac_sparkle_init));
             mac_sparkle_check_update_with_ui = GetDelegate<mac_sparkle_check_update_with_ui_delegate>(handle, nameof(mac_sparkle_check_update_with_ui));
+            mac_sparkle_set_automatic_check_for_updates = GetDelegate<mac_sparkle_set_automatic_check_for_updates_delegate>(handle, nameof(mac_sparkle_set_automatic_check_for_updates));
+            mac_sparkle_get_automatic_check_for_updates = GetDelegate<mac_sparkle_get_automatic_check_for_updates_delegate>(handle, nameof(mac_sparkle_get_automatic_check_for_updates));
+            mac_sparkle_set_update_check_interval = GetDelegate<mac_sparkle_set_update_check_interval_delegate>(handle, nameof(mac_sparkle_set_update_check_interval));
+            mac_sparkle_get_update_check_interval = GetDelegate<mac_sparkle_get_update_check_interval_delegate>(handle, nameof(mac_sparkle_get_update_check_interval));
+            mac_sparkle_get_last_check_time = GetDelegate<mac_sparkle_get_last_check_time_delegate>(handle, nameof(mac_sparkle_get_last_check_time));
         }
 
         /// <summary>
@@ -174,6 +200,39 @@ namespace UpSparkle.Natives
         public void CheckUpdateWithUI()
         {
             mac_sparkle_check_update_with_ui();
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Sparkle should automatically check for updates.
+        /// </summary>
+        public bool IsAutomaticCheckForUpdates
+        {
+            get { return mac_sparkle_get_automatic_check_for_updates() != 0; }
+            set { mac_sparkle_set_automatic_check_for_updates(value ? 1 : 0); }
+        }
+
+        /// <summary>
+        /// Gets or sets the interval in seconds between automatic update checks.
+        /// </summary>
+        public int UpdateCheckInterval
+        {
+            get { return mac_sparkle_get_update_check_interval(); }
+            set { mac_sparkle_set_update_check_interval(value); }
+        }
+
+        /// <summary>
+        /// Gets the time of the last update check, or <see langword="null"/> if updates
+        /// have never been checked.
+        /// </summary>
+        public DateTime? LastCheckTime
+        {
+            get
+            {
+                var unixTime = mac_sparkle_get_last_check_time();
+                if (unixTime <= 0)
+                    return null;
+                return UnixEpoch.AddSeconds(unixTime);
+            }
         }
 
         /// <summary>

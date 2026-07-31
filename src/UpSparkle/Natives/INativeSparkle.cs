@@ -33,5 +33,21 @@ namespace UpSparkle.Natives
         /// Check Update with UI
         /// </summary>
         void CheckUpdateWithUI();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the native updater should automatically check for updates.
+        /// </summary>
+        bool IsAutomaticCheckForUpdates { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interval in seconds for automatic update checks.
+        /// </summary>
+        int UpdateCheckInterval { get; set; }
+
+        /// <summary>
+        /// Gets the last time an update check was performed.
+        /// </summary>
+        DateTime? LastCheckTime { get; }
+
     }
 }

@@ -44,12 +44,34 @@ namespace UpSparkle.Natives
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void win_sparkle_check_update_with_ui_delegate();
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void win_sparkle_set_automatic_check_for_updates_delegate(int state);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate int win_sparkle_get_automatic_check_for_updates_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void win_sparkle_set_update_check_interval_delegate(uint interval);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate uint win_sparkle_get_update_check_interval_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate long win_sparkle_get_last_check_time_delegate();
+
         private static readonly win_sparkle_init_delegate win_sparkle_init;
         private static readonly win_sparkle_cleanup_delegate win_sparkle_cleanup;
         private static readonly win_sparkle_set_appcast_url_delegate win_sparkle_set_appcast_url;
         private static readonly win_sparkle_set_eddsa_public_key_delegate win_sparkle_set_eddsa_public_key;
         private static readonly win_sparkle_set_app_details_delegate win_sparkle_set_app_details;
         private static readonly win_sparkle_check_update_with_ui_delegate win_sparkle_check_update_with_ui;
+        private static readonly win_sparkle_set_automatic_check_for_updates_delegate win_sparkle_set_automatic_check_for_updates;
+        private static readonly win_sparkle_get_automatic_check_for_updates_delegate win_sparkle_get_automatic_check_for_updates;
+        private static readonly win_sparkle_set_update_check_interval_delegate win_sparkle_set_update_check_interval;
+        private static readonly win_sparkle_get_update_check_interval_delegate win_sparkle_get_update_check_interval;
+        private static readonly win_sparkle_get_last_check_time_delegate win_sparkle_get_last_check_time;
+
+        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
         /// Loads <c>WinSparkle.dll</c> for the current process architecture and resolves
@@ -76,6 +98,11 @@ namespace UpSparkle.Natives
             win_sparkle_set_eddsa_public_key = GetDelegate<win_sparkle_set_eddsa_public_key_delegate>(handle, nameof(win_sparkle_set_eddsa_public_key));
             win_sparkle_set_app_details = GetDelegate<win_sparkle_set_app_details_delegate>(handle, nameof(win_sparkle_set_app_details));
             win_sparkle_check_update_with_ui = GetDelegate<win_sparkle_check_update_with_ui_delegate>(handle, nameof(win_sparkle_check_update_with_ui));
+            win_sparkle_set_automatic_check_for_updates = GetDelegate<win_sparkle_set_automatic_check_for_updates_delegate>(handle, nameof(win_sparkle_set_automatic_check_for_updates));
+            win_sparkle_get_automatic_check_for_updates = GetDelegate<win_sparkle_get_automatic_check_for_updates_delegate>(handle, nameof(win_sparkle_get_automatic_check_for_updates));
+            win_sparkle_set_update_check_interval = GetDelegate<win_sparkle_set_update_check_interval_delegate>(handle, nameof(win_sparkle_set_update_check_interval));
+            win_sparkle_get_update_check_interval = GetDelegate<win_sparkle_get_update_check_interval_delegate>(handle, nameof(win_sparkle_get_update_check_interval));
+            win_sparkle_get_last_check_time = GetDelegate<win_sparkle_get_last_check_time_delegate>(handle, nameof(win_sparkle_get_last_check_time));
         }
 
         /// <summary>
@@ -202,6 +229,39 @@ namespace UpSparkle.Natives
         public void CheckUpdateWithUI()
         {
             win_sparkle_check_update_with_ui();
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether WinSparkle should automatically check for updates.
+        /// </summary>
+        public bool IsAutomaticCheckForUpdates
+        {
+            get { return win_sparkle_get_automatic_check_for_updates() != 0; }
+            set { win_sparkle_set_automatic_check_for_updates(value ? 1 : 0); }
+        }
+
+        /// <summary>
+        /// Gets or sets the interval in seconds between automatic update checks.
+        /// </summary>
+        public int UpdateCheckInterval
+        {
+            get { return (int)win_sparkle_get_update_check_interval(); }
+            set { win_sparkle_set_update_check_interval((uint)value); }
+        }
+
+        /// <summary>
+        /// Gets the time of the last update check, or <see langword="null"/> if updates
+        /// have never been checked.
+        /// </summary>
+        public DateTime? LastCheckTime
+        {
+            get
+            {
+                var unixTime = win_sparkle_get_last_check_time();
+                if (unixTime <= 0)
+                    return null;
+                return UnixEpoch.AddSeconds(unixTime);
+            }
         }
 
         /// <summary>

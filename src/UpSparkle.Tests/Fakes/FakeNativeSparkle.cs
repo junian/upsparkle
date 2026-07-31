@@ -54,6 +54,12 @@ internal sealed class FakeNativeSparkle : INativeSparkle
         CheckUpdateWithUICallCount++;
     }
 
+    public bool IsAutomaticCheckForUpdates { get; set; }
+
+    public int UpdateCheckInterval { get; set; }
+
+    public DateTime? LastCheckTime { get; set; }
+
     public void Dispose()
     {
         DisposeCallCount++;
