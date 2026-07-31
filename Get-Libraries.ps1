@@ -90,8 +90,7 @@ if ($WinSparkleArchive) {
 
     # x86 — Release\WinSparkle.dll (no x64/ARM64 in path)
     $x86Dll = Get-ChildItem -Path $LibsDir -Recurse -Filter "WinSparkle.dll" |
-        Where-Object { $_.FullName -match "[/\\]Release[/\\]WinSparkle\.dll$" } |
-        Where-Object { $_.FullName -notmatch "x64" -and $_.FullName -notmatch "ARM64" } |
+        Where-Object { $_.FullName -match "Win32[/\\]Release" } |
         Select-Object -First 1
     if ($x86Dll) {
         Move-Item $x86Dll.FullName (Join-Path $x86Dir "WinSparkle.dll") -Force

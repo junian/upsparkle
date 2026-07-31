@@ -39,7 +39,7 @@ mkdir -p "${RUNTIMES_DIR}/win-x86/native"
 mkdir -p "${RUNTIMES_DIR}/win-x64/native"
 mkdir -p "${RUNTIMES_DIR}/win-arm64/native"
 
-mv libs/WinSparkle-*/Release/WinSparkle.dll          "${RUNTIMES_DIR}/win-x86/native/WinSparkle.dll"
+mv libs/WinSparkle-*/Win32/Release/WinSparkle.dll    "${RUNTIMES_DIR}/win-x86/native/WinSparkle.dll"
 mv libs/WinSparkle-*/x64/Release/WinSparkle.dll      "${RUNTIMES_DIR}/win-x64/native/WinSparkle.dll"
 mv libs/WinSparkle-*/ARM64/Release/WinSparkle.dll    "${RUNTIMES_DIR}/win-arm64/native/WinSparkle.dll"
 
