@@ -28,7 +28,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\UpSparkle\UpSparkle.csproj" />
+    <ProjectReference Include="..\..\src\UpSparkle\UpSparkle.csproj" />
   </ItemGroup>
 
   <!-- Notes about the values set below:
