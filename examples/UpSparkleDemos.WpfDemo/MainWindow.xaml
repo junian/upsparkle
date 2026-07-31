@@ -5,9 +5,36 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UpSparkleDemos.WpfDemo"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
-    <Grid>
-        <Button Content="Check Update" HorizontalAlignment="Left" Margin="87,168,0,0" VerticalAlignment="Top" Click="Button_Click"/>
+        Title="UpSparkle WPF Demo" Height="450" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
+    <StackPanel Width="400" VerticalAlignment="Center">
+        <TextBlock Text="UpSparkle WPF Demo" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,24"/>
 
-    </Grid>
+        <!-- Update settings (backed by IsAutomaticCheckForUpdates / UpdateCheckInterval / LastCheckTime) -->
+        <Grid Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Automatic checks:" VerticalAlignment="Center" Foreground="Gray"/>
+            <CheckBox Grid.Row="0" Grid.Column="2" x:Name="AutomaticChecksCheckBox" VerticalAlignment="Center"
+                      Checked="OnAutomaticChecksChanged" Unchecked="OnAutomaticChecksChanged"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Check interval (s):" VerticalAlignment="Center" Foreground="Gray" Margin="0,8,0,0"/>
+            <TextBox Grid.Row="1" Grid.Column="2" x:Name="IntervalTextBox" VerticalContentAlignment="Center" Margin="0,8,0,0"
+                     LostFocus="OnIntervalLostFocus"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Last check:" VerticalAlignment="Center" Foreground="Gray" Margin="0,8,0,0"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" x:Name="LastCheckTextBlock" VerticalAlignment="Center" Margin="0,8,0,0"/>
+        </Grid>
+
+        <TextBlock x:Name="StatusTextBlock" Text="Library is loaded." HorizontalAlignment="Center" Foreground="Gray" FontStyle="Italic" Margin="0,0,0,24"/>
+        <Button Content="Check for updates" Click="Button_Click" HorizontalAlignment="Center" Width="200"/>
+    </StackPanel>
 </Window>

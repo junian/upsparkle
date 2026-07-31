@@ -1,13 +1,5 @@
-﻿using System.Text;
+﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using UpSparkle;
 
 namespace UpSparkleDemos.WpfDemo;
@@ -36,15 +28,39 @@ public partial class MainWindow : Window
         */
 
         updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
+
+        AutomaticChecksCheckBox.IsChecked = updater.IsAutomaticCheckForUpdates;
+        IntervalTextBox.Text = updater.UpdateCheckInterval.ToString();
+        LastCheckTextBlock.Text = FormatLastCheck(updater.LastCheckTime);
+    }
+
+    private void OnAutomaticChecksChanged(object sender, RoutedEventArgs e)
+    {
+        updater.IsAutomaticCheckForUpdates = AutomaticChecksCheckBox.IsChecked == true;
+    }
+
+    private void OnIntervalLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (int.TryParse(IntervalTextBox.Text, out var seconds) && seconds > 0)
+        {
+            updater.UpdateCheckInterval = seconds;
+        }
     }
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
         updater.CheckUpdateWithUI();
+        LastCheckTextBlock.Text = FormatLastCheck(updater.LastCheckTime);
+        StatusTextBlock.Text = "Requested an update check.";
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         updater.Dispose();
+    }
+
+    private static string FormatLastCheck(DateTime? lastCheckTime)
+    {
+        return lastCheckTime.HasValue ? lastCheckTime.Value.ToLocalTime().ToString("u") : "-";
     }
 }
