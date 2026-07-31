@@ -112,6 +112,34 @@ namespace UpSparkle
         public string AppVersion { get; private set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the native updater should automatically
+        /// check for updates.
+        /// </summary>
+        public bool IsAutomaticCheckForUpdates
+        {
+            get { return nativeSparkle.IsAutomaticCheckForUpdates; }
+            set { nativeSparkle.IsAutomaticCheckForUpdates = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the interval in seconds between automatic update checks.
+        /// </summary>
+        public int UpdateCheckInterval
+        {
+            get { return nativeSparkle.UpdateCheckInterval; }
+            set { nativeSparkle.UpdateCheckInterval = value; }
+        }
+
+        /// <summary>
+        /// Gets the time of the last update check, or <see langword="null"/> if updates
+        /// have never been checked.
+        /// </summary>
+        public DateTime? LastCheckTime
+        {
+            get { return nativeSparkle.LastCheckTime; }
+        }
+
+        /// <summary>
         /// Initializes the native updater by resolving application details from the supplied
         /// assembly's attributes. The appcast URL and EdDSA public key can be embedded in the
         /// assembly via <see cref="AssemblyMetadataAttribute"/> (set in the <c>.csproj</c> or

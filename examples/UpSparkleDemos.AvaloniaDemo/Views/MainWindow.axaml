@@ -28,6 +28,24 @@
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding AppVersion}"/>
         </Grid>
 
+        <!-- Update settings (backed by IsAutomaticCheckForUpdates / UpdateCheckInterval / LastCheckTime) -->
+        <Border BorderBrush="#3399CC" BorderThickness="1" CornerRadius="6" Padding="14" HorizontalAlignment="Center">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Update settings" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+
+                <Grid ColumnDefinitions="Auto,12,200" RowDefinitions="Auto,Auto,Auto" HorizontalAlignment="Center">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Automatic checks:" Foreground="Gray" VerticalAlignment="Center"/>
+                    <ToggleSwitch Grid.Row="0" Grid.Column="2" IsChecked="{Binding IsAutomaticCheckForUpdates}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Check interval (s):" Foreground="Gray" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding UpdateCheckIntervalText}"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Last check:" Foreground="Gray" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding LastCheckTime}" VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
         <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" Foreground="Gray" FontStyle="Italic"/>
         <Button Content="Check for updates" Command="{Binding CheckForUpdatesCommand}" HorizontalAlignment="Center"/>
     </StackPanel>

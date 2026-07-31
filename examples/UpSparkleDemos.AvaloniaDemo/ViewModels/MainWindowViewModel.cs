@@ -26,6 +26,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string appVersion = "-";
 
+    [ObservableProperty]
+    private bool isAutomaticCheckForUpdates;
+
+    [ObservableProperty]
+    private string updateCheckIntervalText = "86400";
+
+    [ObservableProperty]
+    private string lastCheckTime = "-";
+
     public IRelayCommand CheckForUpdatesCommand { get; }
 
     public MainWindowViewModel()
@@ -46,6 +55,25 @@ public partial class MainWindowViewModel : ViewModelBase
         CompanyName = sparkle.CompanyName ?? "-";
         AppName     = sparkle.AppName     ?? "-";
         AppVersion  = sparkle.AppVersion  ?? "-";
+
+        IsAutomaticCheckForUpdates = sparkle.IsAutomaticCheckForUpdates;
+        UpdateCheckIntervalText    = sparkle.UpdateCheckInterval.ToString();
+        LastCheckTime              = sparkle.LastCheckTime?.ToString("u") ?? "-";
+    }
+
+    partial void OnIsAutomaticCheckForUpdatesChanged(bool value)
+    {
+        sparkle.IsAutomaticCheckForUpdates = value;
+        Status = $"Automatic check for updates: {(value ? "enabled" : "disabled")}.";
+    }
+
+    partial void OnUpdateCheckIntervalTextChanged(string value)
+    {
+        if (int.TryParse(value, out var seconds) && seconds > 0)
+        {
+            sparkle.UpdateCheckInterval = seconds;
+            Status = $"Update check interval set to {seconds} seconds.";
+        }
     }
 
     private async void CheckForUpdates()
@@ -54,6 +82,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             sparkle.CheckUpdateWithUI();
             Status = "Requested an update check.";
+            LastCheckTime = sparkle.LastCheckTime?.ToString("u") ?? "-";
         }
         catch (Exception exception)
         {
