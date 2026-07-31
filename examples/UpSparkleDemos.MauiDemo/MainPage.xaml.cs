@@ -5,14 +5,12 @@ namespace UpSparkleDemos.MauiDemo;
 
 public partial class MainPage : ContentPage
 {
-	private UpSparkleUpdater _updater; 
-		
-	int count = 0;
+	private UpSparkleUpdater _updater;
 
 	public MainPage()
 	{
 		InitializeComponent();
-		
+
 		_updater = new UpSparkleUpdater();
 		this.Loaded += (sender, args) =>
 		{
@@ -24,6 +22,10 @@ public partial class MainPage : ContentPage
 			*/
 
 			_updater.Initialize(Assembly.GetExecutingAssembly());
+
+			AutomaticChecksSwitch.IsToggled = _updater.IsAutomaticCheckForUpdates;
+			IntervalEntry.Text = _updater.UpdateCheckInterval.ToString();
+			LastCheckLabel.Text = _updater.LastCheckTime?.ToString("u") ?? "-";
 		};
 
 		this.Disappearing += (sender, args) =>
@@ -32,17 +34,24 @@ public partial class MainPage : ContentPage
 		};
 	}
 
-	private void OnCounterClicked(object? sender, EventArgs e)
+	private void OnAutomaticChecksToggled(object? sender, ToggledEventArgs e)
+	{
+		_updater.IsAutomaticCheckForUpdates = e.Value;
+	}
+
+	private void OnIntervalChanged(object? sender, EventArgs e)
+	{
+		if (int.TryParse(IntervalEntry.Text, out var seconds) && seconds > 0)
+		{
+			_updater.UpdateCheckInterval = seconds;
+		}
+	}
+
+	private void OnCheckForUpdatesClicked(object? sender, EventArgs e)
 	{
 		_updater.CheckUpdateWithUI();
-		
-		count++;
+		LastCheckLabel.Text = _updater.LastCheckTime?.ToString("u") ?? "-";
 
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
-
-		SemanticScreenReader.Announce(CounterBtn.Text);
+		StatusLabel.Text = "Requested an update check.";
 	}
 }
