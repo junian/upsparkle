@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Forms;
 using UpSparkle;
 
@@ -21,16 +22,41 @@ namespace UpSparkleDemos.WinFormsDemo
                 "MCowBQYDK2VwAyEA0+6Z1g5k3l7J8x4F9G");
             */
             updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
+
+            chkAutomaticChecks.Checked = updater.IsAutomaticCheckForUpdates;
+            txtInterval.Text = updater.UpdateCheckInterval.ToString();
+            lblLastCheckValue.Text = FormatLastCheck(updater.LastCheckTime);
+        }
+
+        private void chkAutomaticChecks_CheckedChanged(object sender, System.EventArgs e)
+        {
+            updater.IsAutomaticCheckForUpdates = chkAutomaticChecks.Checked;
+        }
+
+        private void txtInterval_Leave(object sender, System.EventArgs e)
+        {
+            int seconds;
+            if (int.TryParse(txtInterval.Text, out seconds) && seconds > 0)
+            {
+                updater.UpdateCheckInterval = seconds;
+            }
         }
 
         private void btnCheckUpdate_Click(object sender, System.EventArgs e)
         {
             updater.CheckUpdateWithUI();
+            lblLastCheckValue.Text = FormatLastCheck(updater.LastCheckTime);
+            lblStatus.Text = "Requested an update check.";
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             updater.Dispose();
+        }
+
+        private static string FormatLastCheck(DateTime? lastCheckTime)
+        {
+            return lastCheckTime.HasValue ? lastCheckTime.Value.ToLocalTime().ToString("u") : "-";
         }
     }
 }
