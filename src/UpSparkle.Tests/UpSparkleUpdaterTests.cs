@@ -14,13 +14,13 @@ public sealed class UpSparkleUpdaterTests
     [TestMethod]
     public void AppcastUrlMetadataKey_HasExpectedValue()
     {
-        Assert.AreEqual("SUFeedURL", UpSparkleUpdater.AppcastUrlMetadataKey);
+        Assert.AreEqual("SUFeedURL", UpSparkle.UpSparkleSettings.SUFeedURL);
     }
 
     [TestMethod]
     public void EdDSAPublicKeyMetadataKey_HasExpectedValue()
     {
-        Assert.AreEqual("SUPublicEDKey", UpSparkleUpdater.EdDSAPublicKeyMetadataKey);
+        Assert.AreEqual("SUPublicEDKey", UpSparkle.UpSparkleSettings.SUPublicEDKey);
     }
 
     // -------------------------------------------------------------------------

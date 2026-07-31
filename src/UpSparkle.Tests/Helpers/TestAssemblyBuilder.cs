@@ -40,10 +40,10 @@ internal static class TestAssemblyBuilder
             ab.SetCustomAttribute(BuildAttr<AssemblyInformationalVersionAttribute>(appVersion));
 
         if (appcastUrl is not null)
-            ab.SetCustomAttribute(BuildMetadataAttr(UpSparkleUpdater.AppcastUrlMetadataKey, appcastUrl));
+            ab.SetCustomAttribute(BuildMetadataAttr(UpSparkle.UpSparkleSettings.SUFeedURL, appcastUrl));
 
         if (edDSAPublicKey is not null)
-            ab.SetCustomAttribute(BuildMetadataAttr(UpSparkleUpdater.EdDSAPublicKeyMetadataKey, edDSAPublicKey));
+            ab.SetCustomAttribute(BuildMetadataAttr(UpSparkle.UpSparkleSettings.SUPublicEDKey, edDSAPublicKey));
 
         return ab;
     }

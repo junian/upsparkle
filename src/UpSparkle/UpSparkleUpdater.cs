@@ -35,44 +35,6 @@ namespace UpSparkle
         }
 
         /// <summary>
-        /// The metadata key used to embed the appcast feed URL in an assembly via
-        /// <see cref="AssemblyMetadataAttribute"/>.
-        /// Matches the macOS <c>Info.plist</c> key used by the Sparkle framework.
-        /// </summary>
-        /// <example>
-        /// In your <c>.csproj</c> (works on .NET Framework and modern .NET):
-        /// <code>
-        /// &lt;ItemGroup&gt;
-        ///   &lt;AssemblyMetadata Include="SUFeedURL" Value="https://example.com/appcast.xml" /&gt;
-        /// &lt;/ItemGroup&gt;
-        /// </code>
-        /// Or in <c>AssemblyInfo.cs</c> for classic .NET Framework projects:
-        /// <code>
-        /// [assembly: AssemblyMetadata("SUFeedURL", "https://example.com/appcast.xml")]
-        /// </code>
-        /// </example>
-        public const string AppcastUrlMetadataKey = "SUFeedURL";
-
-        /// <summary>
-        /// The metadata key used to embed the EdDSA public key in an assembly via
-        /// <see cref="AssemblyMetadataAttribute"/>.
-        /// Matches the macOS <c>Info.plist</c> key used by the Sparkle framework.
-        /// </summary>
-        /// <example>
-        /// In your <c>.csproj</c> (works on .NET Framework and modern .NET):
-        /// <code>
-        /// &lt;ItemGroup&gt;
-        ///   &lt;AssemblyMetadata Include="SUPublicEDKey" Value="&lt;your-base64-key&gt;" /&gt;
-        /// &lt;/ItemGroup&gt;
-        /// </code>
-        /// Or in <c>AssemblyInfo.cs</c> for classic .NET Framework projects:
-        /// <code>
-        /// [assembly: AssemblyMetadata("SUPublicEDKey", "&lt;your-base64-key&gt;")]
-        /// </code>
-        /// </example>
-        public const string EdDSAPublicKeyMetadataKey = "SUPublicEDKey";
-
-        /// <summary>
         /// Gets a value indicating whether <see cref="Initialize(string,string,string,string,string)"/>
         /// has been called successfully and the native updater is ready to use.
         /// </summary>
@@ -150,7 +112,7 @@ namespace UpSparkle
         /// <list type="number">
         ///   <item>The <paramref name="appcastUrl"/> parameter, if provided.</item>
         ///   <item><see cref="AssemblyMetadataAttribute"/> with key <c>"SUFeedURL"</c>
-        ///         (<see cref="AppcastUrlMetadataKey"/>).</item>
+        ///         (<see cref="UpSparkleSettings.SUFeedURL"/>).</item>
         /// </list>
         /// </para>
         /// <para>
@@ -158,7 +120,7 @@ namespace UpSparkle
         /// <list type="number">
         ///   <item>The <paramref name="edDSAPublicKey"/> parameter, if provided.</item>
         ///   <item><see cref="AssemblyMetadataAttribute"/> with key <c>"SUPublicEDKey"</c>
-        ///         (<see cref="EdDSAPublicKeyMetadataKey"/>).</item>
+        ///         (<see cref="UpSparkleSettings.SUPublicEDKey"/>).</item>
         /// </list>
         /// </para>
         /// <para>
@@ -197,11 +159,11 @@ namespace UpSparkle
 
             // Resolve appcast URL: parameter → assembly metadata fallback
             if (string.IsNullOrWhiteSpace(appcastUrl))
-                appcastUrl = GetAssemblyMetadata(assemblyInfo, AppcastUrlMetadataKey);
+                appcastUrl = GetAssemblyMetadata(assemblyInfo, UpSparkleSettings.SUFeedURL);
 
             // Resolve EdDSA public key: parameter → assembly metadata fallback
             if (string.IsNullOrWhiteSpace(edDSAPublicKey))
-                edDSAPublicKey = GetAssemblyMetadata(assemblyInfo, EdDSAPublicKeyMetadataKey);
+                edDSAPublicKey = GetAssemblyMetadata(assemblyInfo, UpSparkleSettings.SUPublicEDKey);
 
             var companyName = assemblyInfo.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company
                               ?? throw new ArgumentException("Assembly is missing AssemblyCompanyAttribute.",

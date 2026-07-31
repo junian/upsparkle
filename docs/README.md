@@ -334,11 +334,11 @@ All properties return `null` before `Initialize` is called.
 #### Constants
 
 ```csharp
-const string AppcastUrlMetadataKey = "SUFeedURL";
-const string EdDSAPublicKeyMetadataKey = "SUPublicEDKey";
+const string SUFeedURL = nameof(SUFeedURL);
+const string SUPublicEDKey = nameof(SUPublicEDKey);
 ```
 
-Keys used to look up `AssemblyMetadata` values from the assembly. Match the corresponding `Info.plist` keys on macOS.
+Keys used to look up `AssemblyMetadata` values from the assembly. Match the corresponding `Info.plist` keys on macOS. These live in the internal `UpSparkle.UpSparkleSettings` class.
 
 ## Supported Platforms
 
