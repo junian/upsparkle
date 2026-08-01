@@ -37,6 +37,30 @@
                 <Label Grid.Row="2" Grid.Column="2" x:Name="LastCheckLabel" VerticalOptions="Center" />
             </Grid>
 
+            <!-- HTTP headers (backed by HeaderNameEntry / HeaderValueEntry) -->
+            <Grid ColumnDefinitions="Auto,12,180"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="8">
+                <Label Grid.Row="0" Grid.Column="0" Text="Header name:" VerticalOptions="Center" />
+                <Entry Grid.Row="0" Grid.Column="2" x:Name="HeaderNameEntry" Placeholder="Header name" />
+
+                <Label Grid.Row="1" Grid.Column="0" Text="Header value:" VerticalOptions="Center" />
+                <Entry Grid.Row="1" Grid.Column="2" x:Name="HeaderValueEntry" Placeholder="Header value" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button
+                    Text="Set header"
+                    SemanticProperties.Hint="Sets an HTTP header on update requests"
+                    Clicked="OnSetHttpHeaderClicked" />
+
+                <Button
+                    Grid.Column="1"
+                    Text="Clear headers"
+                    SemanticProperties.Hint="Clears all HTTP headers"
+                    Clicked="OnClearHttpHeadersClicked" />
+            </Grid>
+
             <Label
                 x:Name="StatusLabel"
                 Text="Library is loaded."
@@ -44,12 +68,19 @@
                 FontAttributes="Italic"
                 TextColor="Gray" />
 
-            <Button
-                x:Name="CheckBtn"
-                Text="Check for updates"
-                SemanticProperties.Hint="Triggers an update check"
-                Clicked="OnCheckForUpdatesClicked"
-                HorizontalOptions="Fill" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button
+                    x:Name="CheckBtn"
+                    Text="Check for updates"
+                    SemanticProperties.Hint="Triggers an update check"
+                    Clicked="OnCheckForUpdatesClicked" />
+
+                <Button
+                    Grid.Column="1"
+                    Text="Check (no UI)"
+                    SemanticProperties.Hint="Triggers a background update check"
+                    Clicked="OnCheckForUpdatesWithoutUIClicked" />
+            </Grid>
         </VerticalStackLayout>
     </ScrollView>
 

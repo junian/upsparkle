@@ -12,6 +12,7 @@ public partial class MainPage : ContentPage
 		InitializeComponent();
 
 		_updater = new UpSparkleUpdater();
+		_updater.Error += (sender, args) => StatusLabel.Text = "An error occurred while checking for updates.";
 		this.Loaded += (sender, args) =>
 		{
 			/*
@@ -53,5 +54,29 @@ public partial class MainPage : ContentPage
 		LastCheckLabel.Text = _updater.LastCheckTime?.ToString("u") ?? "-";
 
 		StatusLabel.Text = "Requested an update check.";
+	}
+
+	private void OnCheckForUpdatesWithoutUIClicked(object? sender, EventArgs e)
+	{
+		_updater.CheckUpdateWithoutUI();
+		StatusLabel.Text = "Requested a background update check.";
+	}
+
+	private void OnSetHttpHeaderClicked(object? sender, EventArgs e)
+	{
+		if (string.IsNullOrWhiteSpace(HeaderNameEntry.Text))
+		{
+			StatusLabel.Text = "HTTP header name is required.";
+			return;
+		}
+
+		_updater.SetHttpHeader(HeaderNameEntry.Text, HeaderValueEntry.Text);
+		StatusLabel.Text = $"HTTP header set: {HeaderNameEntry.Text}: {HeaderValueEntry.Text}";
+	}
+
+	private void OnClearHttpHeadersClicked(object? sender, EventArgs e)
+	{
+		_updater.ClearHttpHeaders();
+		StatusLabel.Text = "HTTP headers cleared.";
 	}
 }
