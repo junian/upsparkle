@@ -59,7 +59,7 @@ namespace UpSparkle.Natives
         private delegate void win_sparkle_error_callback_delegate();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate void win_sparkle_set_error_callback_delegate(win_sparkle_error_callback_delegate callback);
+        private delegate void win_sparkle_set_error_callback_delegate(IntPtr callback);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void win_sparkle_set_automatic_check_for_updates_delegate(int state);
@@ -95,10 +95,31 @@ namespace UpSparkle.Natives
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
-        /// Holds a strong reference to the error callback delegate so it is not
-        /// garbage collected while the native library still holds a reference to it.
+        /// The user-supplied error callback, invoked by <see cref="ErrorCallbackDispatcher"/>.
+        /// Holds a strong reference so the callback is not garbage collected while the
+        /// native library still holds a reference to it.
         /// </summary>
-        private static win_sparkle_error_callback_delegate errorCallbackHandle;
+        private static NativeSparkleCallback.NativeSparkleErrorCallback errorCallback;
+
+        /// <summary>
+        /// Delegate passed to the native library. Wraps the static
+        /// <see cref="ErrorCallbackDispatcher"/> method so the callback can be AOT-compiled:
+        /// Mono AOT / IL2CPP require callbacks from native code to target a static method
+        /// annotated with <see cref="MonoPInvokeCallbackAttribute"/>. Kept in a static field
+        /// so it is not garbage collected while the native library holds the function pointer.
+        /// </summary>
+        private static readonly win_sparkle_error_callback_delegate errorCallbackHandle =
+            new win_sparkle_error_callback_delegate(ErrorCallbackDispatcher);
+
+        /// <summary>
+        /// AOT-compatible bridge invoked by the native library when an error occurs.
+        /// Dispatches to the current <see cref="errorCallback"/>, if any.
+        /// </summary>
+        [MonoPInvokeCallback(typeof(win_sparkle_error_callback_delegate))]
+        private static void ErrorCallbackDispatcher()
+        {
+            errorCallback?.Invoke();
+        }
 
         /// <summary>
         /// Loads <c>WinSparkle.dll</c> for the current process architecture and resolves
@@ -302,11 +323,11 @@ namespace UpSparkle.Natives
         /// </param>
         public void SetErrorCallback(NativeSparkleCallback.NativeSparkleErrorCallback callback)
         {
-            errorCallbackHandle = callback != null
-                ? new win_sparkle_error_callback_delegate(callback.Invoke)
-                : null;
+            errorCallback = callback;
 
-            win_sparkle_set_error_callback(errorCallbackHandle);
+            win_sparkle_set_error_callback(callback != null
+                ? Marshal.GetFunctionPointerForDelegate<win_sparkle_error_callback_delegate>(errorCallbackHandle)
+                : IntPtr.Zero);
         }
 
         /// <summary>

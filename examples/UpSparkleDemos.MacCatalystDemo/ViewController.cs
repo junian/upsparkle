@@ -92,6 +92,67 @@ public class ViewController : UIViewController
         };
         stackView.AddArrangedSubview(button);
 
+        var backgroundButton = UIButton.FromType(UIButtonType.System);
+        backgroundButton.SetTitle("Check for Updates (no UI)", UIControlState.Normal);
+        backgroundButton.TouchUpInside += (sender, e) =>
+        {
+            _updater?.CheckUpdateWithoutUI();
+            ShowStatus("Requested a background update check.");
+        };
+        stackView.AddArrangedSubview(backgroundButton);
+
+        var headerNameLabel = new UILabel
+        {
+            Text = "HTTP header name:",
+            TextColor = UIColor.SecondaryLabel
+        };
+        stackView.AddArrangedSubview(headerNameLabel);
+
+        var headerNameField = new UITextField
+        {
+            Placeholder = "X-Custom-Header",
+            TextAlignment = UITextAlignment.Center
+        };
+        stackView.AddArrangedSubview(headerNameField);
+
+        var headerValueLabel = new UILabel
+        {
+            Text = "HTTP header value:",
+            TextColor = UIColor.SecondaryLabel
+        };
+        stackView.AddArrangedSubview(headerValueLabel);
+
+        var headerValueField = new UITextField
+        {
+            Placeholder = "header-value",
+            TextAlignment = UITextAlignment.Center
+        };
+        stackView.AddArrangedSubview(headerValueField);
+
+        var setHeaderButton = UIButton.FromType(UIButtonType.System);
+        setHeaderButton.SetTitle("Set header", UIControlState.Normal);
+        setHeaderButton.TouchUpInside += (sender, e) =>
+        {
+            if (string.IsNullOrWhiteSpace(headerNameField.Text))
+            {
+                ShowStatus("HTTP header name is required.");
+                return;
+            }
+
+            _updater?.SetHttpHeader(headerNameField.Text, headerValueField.Text);
+            ShowStatus($"HTTP header set: {headerNameField.Text}: {headerValueField.Text}");
+        };
+        stackView.AddArrangedSubview(setHeaderButton);
+
+        var clearHeadersButton = UIButton.FromType(UIButtonType.System);
+        clearHeadersButton.SetTitle("Clear headers", UIControlState.Normal);
+        clearHeadersButton.TouchUpInside += (sender, e) =>
+        {
+            _updater?.ClearHttpHeaders();
+            ShowStatus("HTTP headers cleared.");
+        };
+        stackView.AddArrangedSubview(clearHeadersButton);
+
         InitUpdater();
 
         automaticSwitch.On = _updater!.IsAutomaticCheckForUpdates;
@@ -102,6 +163,7 @@ public class ViewController : UIViewController
     private void InitUpdater()
     {
         _updater = new UpSparkleUpdater();
+        _updater.Error += (sender, args) => ShowStatus("An error occurred while checking for updates.");
         // Using dummy values for demo purposes
         /*
         _updater.Initialize(
@@ -110,6 +172,16 @@ public class ViewController : UIViewController
             "dummy_public_key");
             */
         _updater.Initialize(Assembly.GetExecutingAssembly());
+    }
+
+    private void ShowStatus(string message)
+    {
+        var alert = new UIAlertController
+        {
+            Title = message
+        };
+        alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+        PresentViewController(alert, true, null);
     }
 
     public void DisposeUpdater()
