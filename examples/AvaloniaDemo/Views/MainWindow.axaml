@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaDemo.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaDemo.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AvaloniaDemo">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold"/>
+
+        <!-- Assembly info (populated after first Init) -->
+        <Grid ColumnDefinitions="Auto,12,*" RowDefinitions="Auto,Auto,Auto" HorizontalAlignment="Center">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Company:"    Foreground="Gray"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CompanyName}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="App:"        Foreground="Gray"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding AppName}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Version:"    Foreground="Gray"/>
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding AppVersion}"/>
+        </Grid>
+
+        <!-- Update settings (backed by IsAutomaticCheckForUpdates / UpdateCheckInterval / LastCheckTime) -->
+        <Border BorderBrush="#3399CC" BorderThickness="1" CornerRadius="6" Padding="14" HorizontalAlignment="Center">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Update settings" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+
+                <Grid ColumnDefinitions="Auto,12,200" RowDefinitions="Auto,Auto,Auto" HorizontalAlignment="Center">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Automatic checks:" Foreground="Gray" VerticalAlignment="Center"/>
+                    <ToggleSwitch Grid.Row="0" Grid.Column="2" IsChecked="{Binding IsAutomaticCheckForUpdates}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Check interval (s):" Foreground="Gray" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding UpdateCheckIntervalText}"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Last check:" Foreground="Gray" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding LastCheckTime}" VerticalAlignment="Center"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- HTTP headers (backed by HttpHeaderName / HttpHeaderValue) -->
+        <Border BorderBrush="#3399CC" BorderThickness="1" CornerRadius="6" Padding="14" HorizontalAlignment="Center">
+            <StackPanel Spacing="8">
+                <TextBlock Text="HTTP headers" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+
+                <Grid ColumnDefinitions="Auto,12,200" RowDefinitions="Auto,Auto" HorizontalAlignment="Center">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Foreground="Gray" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding HttpHeaderName}" PlaceholderText="Header name"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Value:" Foreground="Gray" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding HttpHeaderValue}" PlaceholderText="Header value"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                    <Button Content="Set header" Command="{Binding SetHttpHeaderCommand}"/>
+                    <Button Content="Clear headers" Command="{Binding ClearHttpHeadersCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" Foreground="Gray" FontStyle="Italic"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+            <Button Content="Check for updates" Command="{Binding CheckForUpdatesCommand}"/>
+            <Button Content="Check for updates (no UI)" Command="{Binding CheckForUpdatesWithoutUICommand}"/>
+        </StackPanel>
+    </StackPanel>
+
+</Window>

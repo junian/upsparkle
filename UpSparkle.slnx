@@ -1,17 +1,17 @@
 <Solution>
   <Folder Name="/Demos/">
-    <Project Path="examples/UpSparkleDemos.AvaloniaDemo/UpSparkleDemos.AvaloniaDemo.csproj">
+    <Project Path="examples/AvaloniaDemo/AvaloniaDemo.csproj">
       <Deploy />
     </Project>
-    <Project Path="examples/UpSparkleDemos.MacCatalystDemo/UpSparkleDemos.MacCatalystDemo.csproj">
+    <Project Path="examples/MacCatalystDemo/MacCatalystDemo.csproj">
       <Deploy />
     </Project>
-    <Project Path="examples/UpSparkleDemos.MacOSDemo/UpSparkleDemos.MacOSDemo.csproj">
+    <Project Path="examples/MacOSDemo/MacOSDemo.csproj">
       <Deploy />
     </Project>
-    <Project Path="examples/UpSparkleDemos.MauiDemo/UpSparkleDemos.MauiDemo.csproj" />
-    <Project Path="examples/UpSparkleDemos.WinFormsDemo/UpSparkleDemos.WinFormsDemo.csproj" />
-    <Project Path="examples/UpSparkleDemos.WpfDemo/UpSparkleDemos.WpfDemo.csproj" />
+    <Project Path="examples/MauiDemo/MauiDemo.csproj" />
+    <Project Path="examples/WinFormsDemo/WinFormsDemo.csproj" />
+    <Project Path="examples/WpfDemo/WpfDemo.csproj" />
   </Folder>
   <Project Path="src/UpSparkle.Tests/UpSparkle.Tests.csproj" />
   <Project Path="src/UpSparkle/UpSparkle.csproj" />

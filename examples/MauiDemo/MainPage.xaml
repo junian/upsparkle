@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiDemo.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Image
+                Source="dotnet_bot.png"
+                HeightRequest="185"
+                Aspect="AspectFit"
+                SemanticProperties.Description="dot net bot in a submarine number ten" />
+
+            <Label
+                Text="UpSparkle MAUI Demo"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+
+            <!-- Update settings (backed by IsAutomaticCheckForUpdates / UpdateCheckInterval / LastCheckTime) -->
+            <Grid ColumnDefinitions="Auto,12,180"
+                  RowDefinitions="Auto,Auto,Auto"
+                  RowSpacing="8">
+                <Label Grid.Row="0" Grid.Column="0" Text="Automatic checks:" VerticalOptions="Center" />
+                <Switch Grid.Row="0" Grid.Column="2" x:Name="AutomaticChecksSwitch"
+                        VerticalOptions="Center"
+                        Toggled="OnAutomaticChecksToggled" />
+
+                <Label Grid.Row="1" Grid.Column="0" Text="Check interval (s):" VerticalOptions="Center" />
+                <Entry Grid.Row="1" Grid.Column="2" x:Name="IntervalEntry"
+                       Keyboard="Numeric"
+                       Completed="OnIntervalChanged"
+                       Unfocused="OnIntervalChanged" />
+
+                <Label Grid.Row="2" Grid.Column="0" Text="Last check:" VerticalOptions="Center" />
+                <Label Grid.Row="2" Grid.Column="2" x:Name="LastCheckLabel" VerticalOptions="Center" />
+            </Grid>
+
+            <!-- HTTP headers (backed by HeaderNameEntry / HeaderValueEntry) -->
+            <Grid ColumnDefinitions="Auto,12,180"
+                  RowDefinitions="Auto,Auto"
+                  RowSpacing="8">
+                <Label Grid.Row="0" Grid.Column="0" Text="Header name:" VerticalOptions="Center" />
+                <Entry Grid.Row="0" Grid.Column="2" x:Name="HeaderNameEntry" Placeholder="Header name" />
+
+                <Label Grid.Row="1" Grid.Column="0" Text="Header value:" VerticalOptions="Center" />
+                <Entry Grid.Row="1" Grid.Column="2" x:Name="HeaderValueEntry" Placeholder="Header value" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button
+                    Text="Set header"
+                    SemanticProperties.Hint="Sets an HTTP header on update requests"
+                    Clicked="OnSetHttpHeaderClicked" />
+
+                <Button
+                    Grid.Column="1"
+                    Text="Clear headers"
+                    SemanticProperties.Hint="Clears all HTTP headers"
+                    Clicked="OnClearHttpHeadersClicked" />
+            </Grid>
+
+            <Label
+                x:Name="StatusLabel"
+                Text="Library is loaded."
+                HorizontalTextAlignment="Center"
+                FontAttributes="Italic"
+                TextColor="Gray" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button
+                    x:Name="CheckBtn"
+                    Text="Check for updates"
+                    SemanticProperties.Hint="Triggers an update check"
+                    Clicked="OnCheckForUpdatesClicked" />
+
+                <Button
+                    Grid.Column="1"
+                    Text="Check (no UI)"
+                    SemanticProperties.Hint="Triggers a background update check"
+                    Clicked="OnCheckForUpdatesWithoutUIClicked" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
