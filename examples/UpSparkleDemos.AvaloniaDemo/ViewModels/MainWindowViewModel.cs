@@ -35,11 +35,28 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string lastCheckTime = "-";
 
+    [ObservableProperty]
+    private string httpHeaderName = "";
+
+    [ObservableProperty]
+    private string httpHeaderValue = "";
+
     public IRelayCommand CheckForUpdatesCommand { get; }
+
+    public IRelayCommand CheckForUpdatesWithoutUICommand { get; }
+
+    public IRelayCommand SetHttpHeaderCommand { get; }
+
+    public IRelayCommand ClearHttpHeadersCommand { get; }
 
     public MainWindowViewModel()
     {
         CheckForUpdatesCommand = new RelayCommand(CheckForUpdates);
+        CheckForUpdatesWithoutUICommand = new RelayCommand(CheckForUpdatesWithoutUI);
+        SetHttpHeaderCommand = new RelayCommand(SetHttpHeader);
+        ClearHttpHeadersCommand = new RelayCommand(ClearHttpHeaders);
+
+        sparkle.Error += (sender, args) => Status = "An error occurred while checking for updates.";
     }
 
     public void Init()
@@ -88,5 +105,36 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Status = exception.Message;
         }
+    }
+
+    private async void CheckForUpdatesWithoutUI()
+    {
+        try
+        {
+            sparkle.CheckUpdateWithoutUI();
+            Status = "Requested a background update check.";
+        }
+        catch (Exception exception)
+        {
+            Status = exception.Message;
+        }
+    }
+
+    private void SetHttpHeader()
+    {
+        if (string.IsNullOrWhiteSpace(HttpHeaderName))
+        {
+            Status = "HTTP header name is required.";
+            return;
+        }
+
+        sparkle.SetHttpHeader(HttpHeaderName, HttpHeaderValue);
+        Status = $"HTTP header set: {HttpHeaderName}: {HttpHeaderValue}";
+    }
+
+    private void ClearHttpHeaders()
+    {
+        sparkle.ClearHttpHeaders();
+        Status = "HTTP headers cleared.";
     }
 }
