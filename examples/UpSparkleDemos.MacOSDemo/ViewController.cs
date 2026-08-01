@@ -27,6 +27,7 @@ public partial class ViewController : NSViewController {
 			"https://sparkle-project.org/files/sparkletestcast.xml",
 			"MCwCFC9S9Yv8lzxX6BTMvR1/6K6O4sSVAhRNLAnl9jH+P86p5595B0vC+59L");
 			*/
+		_updater.Error += (sender, e) => ShowStatus("An error occurred while checking for updates.");
 
 		var stackView = new NSStackView
 		{
@@ -99,6 +100,78 @@ public partial class ViewController : NSViewController {
 		};
 
 		stackView.AddArrangedSubview(checkUpdateButton);
+
+		var checkUpdateWithoutUIButton = new NSButton
+		{
+			Title = "Check for update (no UI)",
+			BezelStyle = NSBezelStyle.Rounded
+		};
+
+		checkUpdateWithoutUIButton.Activated += (sender, e) =>
+		{
+			_updater.CheckUpdateWithoutUI();
+			ShowStatus("Requested a background update check.");
+		};
+
+		stackView.AddArrangedSubview(checkUpdateWithoutUIButton);
+
+		var headerNameLabel = new NSTextField
+		{
+			StringValue = "HTTP header name:",
+			Editable = false,
+			Bordered = false,
+			DrawsBackground = false
+		};
+		stackView.AddArrangedSubview(headerNameLabel);
+
+		var headerNameField = new NSTextField();
+		stackView.AddArrangedSubview(headerNameField);
+
+		var headerValueLabel = new NSTextField
+		{
+			StringValue = "HTTP header value:",
+			Editable = false,
+			Bordered = false,
+			DrawsBackground = false
+		};
+		stackView.AddArrangedSubview(headerValueLabel);
+
+		var headerValueField = new NSTextField();
+		stackView.AddArrangedSubview(headerValueField);
+
+		var setHeaderButton = new NSButton
+		{
+			Title = "Set header",
+			BezelStyle = NSBezelStyle.Rounded
+		};
+
+		setHeaderButton.Activated += (sender, e) =>
+		{
+			if (string.IsNullOrWhiteSpace(headerNameField.StringValue))
+			{
+				ShowStatus("HTTP header name is required.");
+				return;
+			}
+
+			_updater.SetHttpHeader(headerNameField.StringValue, headerValueField.StringValue);
+			ShowStatus($"HTTP header set: {headerNameField.StringValue}: {headerValueField.StringValue}");
+		};
+
+		stackView.AddArrangedSubview(setHeaderButton);
+
+		var clearHeadersButton = new NSButton
+		{
+			Title = "Clear headers",
+			BezelStyle = NSBezelStyle.Rounded
+		};
+
+		clearHeadersButton.Activated += (sender, e) =>
+		{
+			_updater.ClearHttpHeaders();
+			ShowStatus("HTTP headers cleared.");
+		};
+
+		stackView.AddArrangedSubview(clearHeadersButton);
 	}
 
 	protected override void Dispose(bool disposing)
@@ -122,5 +195,14 @@ public partial class ViewController : NSViewController {
 	private static string FormatLastCheck(DateTime? lastCheckTime)
 	{
 		return lastCheckTime.HasValue ? lastCheckTime.Value.ToLocalTime().ToString("u") : "-";
+	}
+
+	private void ShowStatus(string message)
+	{
+		var alert = new NSAlert
+		{
+			MessageText = message
+		};
+		alert.RunModal();
 	}
 }
