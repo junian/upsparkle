@@ -41,6 +41,9 @@ namespace UpSparkle.Natives
         private delegate void mac_sparkle_check_update_with_ui_delegate();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void mac_sparkle_check_update_without_ui_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void mac_sparkle_set_automatic_check_for_updates_delegate(int state);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -55,16 +58,40 @@ namespace UpSparkle.Natives
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate long mac_sparkle_get_last_check_time_delegate();
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private delegate void mac_sparkle_set_http_header_delegate(
+            [MarshalAs(UnmanagedType.LPStr)] string name,
+            [MarshalAs(UnmanagedType.LPStr)] string value);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void mac_sparkle_clear_http_headers_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void mac_sparkle_error_callback_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void mac_sparkle_set_error_callback_delegate(mac_sparkle_error_callback_delegate callback);
+
         private static readonly mac_sparkle_set_appcast_url_delegate mac_sparkle_set_appcast_url;
         private static readonly mac_sparkle_init_delegate mac_sparkle_init;
         private static readonly mac_sparkle_check_update_with_ui_delegate mac_sparkle_check_update_with_ui;
+        private static readonly mac_sparkle_check_update_without_ui_delegate mac_sparkle_check_update_without_ui;
         private static readonly mac_sparkle_set_automatic_check_for_updates_delegate mac_sparkle_set_automatic_check_for_updates;
         private static readonly mac_sparkle_get_automatic_check_for_updates_delegate mac_sparkle_get_automatic_check_for_updates;
         private static readonly mac_sparkle_set_update_check_interval_delegate mac_sparkle_set_update_check_interval;
         private static readonly mac_sparkle_get_update_check_interval_delegate mac_sparkle_get_update_check_interval;
         private static readonly mac_sparkle_get_last_check_time_delegate mac_sparkle_get_last_check_time;
+        private static readonly mac_sparkle_set_http_header_delegate mac_sparkle_set_http_header;
+        private static readonly mac_sparkle_clear_http_headers_delegate mac_sparkle_clear_http_headers;
+        private static readonly mac_sparkle_set_error_callback_delegate mac_sparkle_set_error_callback;
 
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        /// <summary>
+        /// Holds a strong reference to the error callback delegate so it is not
+        /// garbage collected while the native library still holds a reference to it.
+        /// </summary>
+        private static mac_sparkle_error_callback_delegate errorCallbackHandle;
 
         /// <summary>
         /// Loads <c>libMacSparkle.dylib</c> and resolves all required native function pointers.
@@ -88,11 +115,15 @@ namespace UpSparkle.Natives
             mac_sparkle_set_appcast_url = GetDelegate<mac_sparkle_set_appcast_url_delegate>(handle, nameof(mac_sparkle_set_appcast_url));
             mac_sparkle_init = GetDelegate<mac_sparkle_init_delegate>(handle, nameof(mac_sparkle_init));
             mac_sparkle_check_update_with_ui = GetDelegate<mac_sparkle_check_update_with_ui_delegate>(handle, nameof(mac_sparkle_check_update_with_ui));
+            mac_sparkle_check_update_without_ui = GetDelegate<mac_sparkle_check_update_without_ui_delegate>(handle, nameof(mac_sparkle_check_update_without_ui));
             mac_sparkle_set_automatic_check_for_updates = GetDelegate<mac_sparkle_set_automatic_check_for_updates_delegate>(handle, nameof(mac_sparkle_set_automatic_check_for_updates));
             mac_sparkle_get_automatic_check_for_updates = GetDelegate<mac_sparkle_get_automatic_check_for_updates_delegate>(handle, nameof(mac_sparkle_get_automatic_check_for_updates));
             mac_sparkle_set_update_check_interval = GetDelegate<mac_sparkle_set_update_check_interval_delegate>(handle, nameof(mac_sparkle_set_update_check_interval));
             mac_sparkle_get_update_check_interval = GetDelegate<mac_sparkle_get_update_check_interval_delegate>(handle, nameof(mac_sparkle_get_update_check_interval));
             mac_sparkle_get_last_check_time = GetDelegate<mac_sparkle_get_last_check_time_delegate>(handle, nameof(mac_sparkle_get_last_check_time));
+            mac_sparkle_set_http_header = GetDelegate<mac_sparkle_set_http_header_delegate>(handle, nameof(mac_sparkle_set_http_header));
+            mac_sparkle_clear_http_headers = GetDelegate<mac_sparkle_clear_http_headers_delegate>(handle, nameof(mac_sparkle_clear_http_headers));
+            mac_sparkle_set_error_callback = GetDelegate<mac_sparkle_set_error_callback_delegate>(handle, nameof(mac_sparkle_set_error_callback));
         }
 
         /// <summary>
@@ -200,6 +231,58 @@ namespace UpSparkle.Natives
         public void CheckUpdateWithUI()
         {
             mac_sparkle_check_update_with_ui();
+        }
+
+        /// <summary>
+        /// Triggers an update check in the background without user interface feedback.
+        /// Use with caution and generally not recommended: by default Sparkle schedules
+        /// background checks automatically, and calling this manually may interfere
+        /// with Sparkle's scheduler.
+        /// </summary>
+        public void CheckUpdateWithoutUI()
+        {
+            mac_sparkle_check_update_without_ui();
+        }
+
+        /// <summary>
+        /// Sets an HTTP header to be sent with update requests (appcast checks,
+        /// release note downloads, and update downloads). The header is stored in the
+        /// updater's HTTP headers dictionary; calling again with the same name replaces
+        /// the previous value.
+        /// </summary>
+        /// <param name="name">The HTTP header name.</param>
+        /// <param name="value">The HTTP header value.</param>
+        public void SetHttpHeader(string name, string value)
+        {
+            mac_sparkle_set_http_header(name, value);
+        }
+
+        /// <summary>
+        /// Clears all HTTP headers previously set via <see cref="SetHttpHeader"/>.
+        /// </summary>
+        public void ClearHttpHeaders()
+        {
+            mac_sparkle_clear_http_headers();
+        }
+
+        /// <summary>
+        /// Sets a callback to be invoked when the Sparkle updater encounters an error.
+        /// The callback is invoked on the main thread with no arguments.
+        /// Pass <see langword="null"/> to clear a previously set callback.
+        /// The callback is not invoked for the normal "no update found" outcome or for
+        /// a user-canceled installation.
+        /// </summary>
+        /// <param name="callback">
+        /// The method to invoke when the updater encounters an error, or
+        /// <see langword="null"/> to clear the previously set callback.
+        /// </param>
+        public void SetErrorCallback(NativeSparkleCallback.NativeSparkleErrorCallback callback)
+        {
+            errorCallbackHandle = callback != null
+                ? new mac_sparkle_error_callback_delegate(callback.Invoke)
+                : null;
+
+            mac_sparkle_set_error_callback(errorCallbackHandle);
         }
 
         /// <summary>

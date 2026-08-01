@@ -35,6 +35,32 @@ namespace UpSparkle.Natives
         void CheckUpdateWithUI();
 
         /// <summary>
+        /// Check Update without UI in the background
+        /// </summary>
+        void CheckUpdateWithoutUI();
+
+        /// <summary>
+        /// Sets an HTTP header to be sent with update requests
+        /// </summary>
+        /// <param name="name">The HTTP header name.</param>
+        /// <param name="value">The HTTP header value.</param>
+        void SetHttpHeader(string name, string value);
+
+        /// <summary>
+        /// Clears all HTTP headers previously set via <see cref="SetHttpHeader"/>.
+        /// </summary>
+        void ClearHttpHeaders();
+
+        /// <summary>
+        /// Sets a callback to be invoked when the native updater encounters an error.
+        /// </summary>
+        /// <param name="callback">
+        /// The method to invoke when the updater encounters an error, or
+        /// <see langword="null"/> to clear the previously set callback.
+        /// </param>
+        void SetErrorCallback(NativeSparkleCallback.NativeSparkleErrorCallback callback);
+
+        /// <summary>
         /// Gets or sets a value indicating whether the native updater should automatically check for updates.
         /// </summary>
         bool IsAutomaticCheckForUpdates { get; set; }

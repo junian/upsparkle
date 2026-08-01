@@ -45,6 +45,23 @@ namespace UpSparkle.Natives
         private delegate void win_sparkle_check_update_with_ui_delegate();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void win_sparkle_check_update_without_ui_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private delegate void win_sparkle_set_http_header_delegate(
+            [MarshalAs(UnmanagedType.LPStr)] string name,
+            [MarshalAs(UnmanagedType.LPStr)] string value);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void win_sparkle_clear_http_headers_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void win_sparkle_error_callback_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void win_sparkle_set_error_callback_delegate(win_sparkle_error_callback_delegate callback);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void win_sparkle_set_automatic_check_for_updates_delegate(int state);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -65,6 +82,10 @@ namespace UpSparkle.Natives
         private static readonly win_sparkle_set_eddsa_public_key_delegate win_sparkle_set_eddsa_public_key;
         private static readonly win_sparkle_set_app_details_delegate win_sparkle_set_app_details;
         private static readonly win_sparkle_check_update_with_ui_delegate win_sparkle_check_update_with_ui;
+        private static readonly win_sparkle_check_update_without_ui_delegate win_sparkle_check_update_without_ui;
+        private static readonly win_sparkle_set_http_header_delegate win_sparkle_set_http_header;
+        private static readonly win_sparkle_clear_http_headers_delegate win_sparkle_clear_http_headers;
+        private static readonly win_sparkle_set_error_callback_delegate win_sparkle_set_error_callback;
         private static readonly win_sparkle_set_automatic_check_for_updates_delegate win_sparkle_set_automatic_check_for_updates;
         private static readonly win_sparkle_get_automatic_check_for_updates_delegate win_sparkle_get_automatic_check_for_updates;
         private static readonly win_sparkle_set_update_check_interval_delegate win_sparkle_set_update_check_interval;
@@ -72,6 +93,12 @@ namespace UpSparkle.Natives
         private static readonly win_sparkle_get_last_check_time_delegate win_sparkle_get_last_check_time;
 
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        /// <summary>
+        /// Holds a strong reference to the error callback delegate so it is not
+        /// garbage collected while the native library still holds a reference to it.
+        /// </summary>
+        private static win_sparkle_error_callback_delegate errorCallbackHandle;
 
         /// <summary>
         /// Loads <c>WinSparkle.dll</c> for the current process architecture and resolves
@@ -98,6 +125,10 @@ namespace UpSparkle.Natives
             win_sparkle_set_eddsa_public_key = GetDelegate<win_sparkle_set_eddsa_public_key_delegate>(handle, nameof(win_sparkle_set_eddsa_public_key));
             win_sparkle_set_app_details = GetDelegate<win_sparkle_set_app_details_delegate>(handle, nameof(win_sparkle_set_app_details));
             win_sparkle_check_update_with_ui = GetDelegate<win_sparkle_check_update_with_ui_delegate>(handle, nameof(win_sparkle_check_update_with_ui));
+            win_sparkle_check_update_without_ui = GetDelegate<win_sparkle_check_update_without_ui_delegate>(handle, nameof(win_sparkle_check_update_without_ui));
+            win_sparkle_set_http_header = GetDelegate<win_sparkle_set_http_header_delegate>(handle, nameof(win_sparkle_set_http_header));
+            win_sparkle_clear_http_headers = GetDelegate<win_sparkle_clear_http_headers_delegate>(handle, nameof(win_sparkle_clear_http_headers));
+            win_sparkle_set_error_callback = GetDelegate<win_sparkle_set_error_callback_delegate>(handle, nameof(win_sparkle_set_error_callback));
             win_sparkle_set_automatic_check_for_updates = GetDelegate<win_sparkle_set_automatic_check_for_updates_delegate>(handle, nameof(win_sparkle_set_automatic_check_for_updates));
             win_sparkle_get_automatic_check_for_updates = GetDelegate<win_sparkle_get_automatic_check_for_updates_delegate>(handle, nameof(win_sparkle_get_automatic_check_for_updates));
             win_sparkle_set_update_check_interval = GetDelegate<win_sparkle_set_update_check_interval_delegate>(handle, nameof(win_sparkle_set_update_check_interval));
@@ -229,6 +260,53 @@ namespace UpSparkle.Natives
         public void CheckUpdateWithUI()
         {
             win_sparkle_check_update_with_ui();
+        }
+
+        /// <summary>
+        /// Triggers an update check in the background without user interface feedback.
+        /// Use with caution and generally not recommended: by default WinSparkle
+        /// checks for updates automatically, and calling this manually may interfere
+        /// with its scheduler.
+        /// </summary>
+        public void CheckUpdateWithoutUI()
+        {
+            win_sparkle_check_update_without_ui();
+        }
+
+        /// <summary>
+        /// Sets an HTTP header to be sent with update requests (appcast checks and
+        /// update downloads). Calling again with the same name replaces the previous value.
+        /// </summary>
+        /// <param name="name">The HTTP header name.</param>
+        /// <param name="value">The HTTP header value.</param>
+        public void SetHttpHeader(string name, string value)
+        {
+            win_sparkle_set_http_header(name, value);
+        }
+
+        /// <summary>
+        /// Clears all HTTP headers previously set via <see cref="SetHttpHeader"/>.
+        /// </summary>
+        public void ClearHttpHeaders()
+        {
+            win_sparkle_clear_http_headers();
+        }
+
+        /// <summary>
+        /// Sets a callback to be invoked when the WinSparkle updater encounters an error.
+        /// Pass <see langword="null"/> to clear a previously set callback.
+        /// </summary>
+        /// <param name="callback">
+        /// The method to invoke when the updater encounters an error, or
+        /// <see langword="null"/> to clear the previously set callback.
+        /// </param>
+        public void SetErrorCallback(NativeSparkleCallback.NativeSparkleErrorCallback callback)
+        {
+            errorCallbackHandle = callback != null
+                ? new win_sparkle_error_callback_delegate(callback.Invoke)
+                : null;
+
+            win_sparkle_set_error_callback(errorCallbackHandle);
         }
 
         /// <summary>
