@@ -28,6 +28,7 @@ public partial class MainWindow : Window
         */
 
         updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
+        updater.Error += (s, args) => StatusTextBlock.Text = "An error occurred while checking for updates.";
 
         AutomaticChecksCheckBox.IsChecked = updater.IsAutomaticCheckForUpdates;
         IntervalTextBox.Text = updater.UpdateCheckInterval.ToString();
@@ -52,6 +53,30 @@ public partial class MainWindow : Window
         updater.CheckUpdateWithUI();
         LastCheckTextBlock.Text = FormatLastCheck(updater.LastCheckTime);
         StatusTextBlock.Text = "Requested an update check.";
+    }
+
+    private void OnCheckForUpdatesWithoutUIClicked(object sender, RoutedEventArgs e)
+    {
+        updater.CheckUpdateWithoutUI();
+        StatusTextBlock.Text = "Requested a background update check.";
+    }
+
+    private void OnSetHttpHeaderClicked(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(HeaderNameTextBox.Text))
+        {
+            StatusTextBlock.Text = "HTTP header name is required.";
+            return;
+        }
+
+        updater.SetHttpHeader(HeaderNameTextBox.Text, HeaderValueTextBox.Text);
+        StatusTextBlock.Text = $"HTTP header set: {HeaderNameTextBox.Text}: {HeaderValueTextBox.Text}";
+    }
+
+    private void OnClearHttpHeadersClicked(object sender, RoutedEventArgs e)
+    {
+        updater.ClearHttpHeaders();
+        StatusTextBlock.Text = "HTTP headers cleared.";
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

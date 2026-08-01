@@ -34,7 +34,46 @@
             <TextBlock Grid.Row="2" Grid.Column="2" x:Name="LastCheckTextBlock" VerticalAlignment="Center" Margin="0,8,0,0"/>
         </Grid>
 
+        <!-- HTTP headers (backed by HeaderNameTextBox / HeaderValueTextBox) -->
+        <Grid Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Header name:" VerticalAlignment="Center" Foreground="Gray"/>
+            <TextBox Grid.Row="0" Grid.Column="2" x:Name="HeaderNameTextBox" VerticalContentAlignment="Center" Margin="0,0,0,8"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Header value:" VerticalAlignment="Center" Foreground="Gray"/>
+            <TextBox Grid.Row="1" Grid.Column="2" x:Name="HeaderValueTextBox" VerticalContentAlignment="Center"/>
+        </Grid>
+
+        <Grid Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Set header" Click="OnSetHttpHeaderClicked" HorizontalAlignment="Stretch"/>
+            <Button Grid.Column="2" Content="Clear headers" Click="OnClearHttpHeadersClicked" HorizontalAlignment="Stretch"/>
+        </Grid>
+
         <TextBlock x:Name="StatusTextBlock" Text="Library is loaded." HorizontalAlignment="Center" Foreground="Gray" FontStyle="Italic" Margin="0,0,0,24"/>
-        <Button Content="Check for updates" Click="Button_Click" HorizontalAlignment="Center" Width="200"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Check for updates" Click="Button_Click" HorizontalAlignment="Stretch"/>
+            <Button Grid.Column="2" Content="Check (no UI)" Click="OnCheckForUpdatesWithoutUIClicked" HorizontalAlignment="Stretch"/>
+        </Grid>
     </StackPanel>
 </Window>

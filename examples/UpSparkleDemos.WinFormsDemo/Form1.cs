@@ -22,6 +22,7 @@ namespace UpSparkleDemos.WinFormsDemo
                 "MCowBQYDK2VwAyEA0+6Z1g5k3l7J8x4F9G");
             */
             updater.Initialize(System.Reflection.Assembly.GetExecutingAssembly());
+            updater.Error += (s, args) => lblStatus.Text = "An error occurred while checking for updates.";
 
             chkAutomaticChecks.Checked = updater.IsAutomaticCheckForUpdates;
             txtInterval.Text = updater.UpdateCheckInterval.ToString();
@@ -47,6 +48,30 @@ namespace UpSparkleDemos.WinFormsDemo
             updater.CheckUpdateWithUI();
             lblLastCheckValue.Text = FormatLastCheck(updater.LastCheckTime);
             lblStatus.Text = "Requested an update check.";
+        }
+
+        private void btnCheckUpdateWithoutUI_Click(object sender, System.EventArgs e)
+        {
+            updater.CheckUpdateWithoutUI();
+            lblStatus.Text = "Requested a background update check.";
+        }
+
+        private void btnSetHeader_Click(object sender, System.EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtHeaderName.Text))
+            {
+                lblStatus.Text = "HTTP header name is required.";
+                return;
+            }
+
+            updater.SetHttpHeader(txtHeaderName.Text, txtHeaderValue.Text);
+            lblStatus.Text = $"HTTP header set: {txtHeaderName.Text}: {txtHeaderValue.Text}";
+        }
+
+        private void btnClearHeaders_Click(object sender, System.EventArgs e)
+        {
+            updater.ClearHttpHeaders();
+            lblStatus.Text = "HTTP headers cleared.";
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -32,12 +32,19 @@ namespace UpSparkleDemos.WinFormsDemo
         private void InitializeComponent()
         {
             this.btnCheckUpdate = new System.Windows.Forms.Button();
+            this.btnCheckUpdateWithoutUI = new System.Windows.Forms.Button();
             this.chkAutomaticChecks = new System.Windows.Forms.CheckBox();
             this.lblInterval = new System.Windows.Forms.Label();
             this.txtInterval = new System.Windows.Forms.TextBox();
             this.lblLastCheck = new System.Windows.Forms.Label();
             this.lblLastCheckValue = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.lblHeaderName = new System.Windows.Forms.Label();
+            this.txtHeaderName = new System.Windows.Forms.TextBox();
+            this.lblHeaderValue = new System.Windows.Forms.Label();
+            this.txtHeaderValue = new System.Windows.Forms.TextBox();
+            this.btnSetHeader = new System.Windows.Forms.Button();
+            this.btnClearHeaders = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnCheckUpdate
@@ -49,6 +56,16 @@ namespace UpSparkleDemos.WinFormsDemo
             this.btnCheckUpdate.Text = "Check for updates";
             this.btnCheckUpdate.UseVisualStyleBackColor = true;
             this.btnCheckUpdate.Click += new System.EventHandler(this.btnCheckUpdate_Click);
+            // 
+            // btnCheckUpdateWithoutUI
+            // 
+            this.btnCheckUpdateWithoutUI.Location = new System.Drawing.Point(220, 220);
+            this.btnCheckUpdateWithoutUI.Name = "btnCheckUpdateWithoutUI";
+            this.btnCheckUpdateWithoutUI.Size = new System.Drawing.Size(150, 23);
+            this.btnCheckUpdateWithoutUI.TabIndex = 7;
+            this.btnCheckUpdateWithoutUI.Text = "Check (no UI)";
+            this.btnCheckUpdateWithoutUI.UseVisualStyleBackColor = true;
+            this.btnCheckUpdateWithoutUI.Click += new System.EventHandler(this.btnCheckUpdateWithoutUI_Click);
             // 
             // chkAutomaticChecks
             // 
@@ -107,15 +124,74 @@ namespace UpSparkleDemos.WinFormsDemo
             this.lblStatus.TabIndex = 6;
             this.lblStatus.Text = "Library is loaded.";
             // 
+            // lblHeaderName
+            // 
+            this.lblHeaderName.AutoSize = true;
+            this.lblHeaderName.Location = new System.Drawing.Point(58, 265);
+            this.lblHeaderName.Name = "lblHeaderName";
+            this.lblHeaderName.Size = new System.Drawing.Size(73, 13);
+            this.lblHeaderName.TabIndex = 8;
+            this.lblHeaderName.Text = "HTTP header name:";
+            // 
+            // txtHeaderName
+            // 
+            this.txtHeaderName.Location = new System.Drawing.Point(220, 262);
+            this.txtHeaderName.Name = "txtHeaderName";
+            this.txtHeaderName.Size = new System.Drawing.Size(150, 20);
+            this.txtHeaderName.TabIndex = 9;
+            // 
+            // lblHeaderValue
+            // 
+            this.lblHeaderValue.AutoSize = true;
+            this.lblHeaderValue.Location = new System.Drawing.Point(58, 295);
+            this.lblHeaderValue.Name = "lblHeaderValue";
+            this.lblHeaderValue.Size = new System.Drawing.Size(76, 13);
+            this.lblHeaderValue.TabIndex = 10;
+            this.lblHeaderValue.Text = "HTTP header value:";
+            // 
+            // txtHeaderValue
+            // 
+            this.txtHeaderValue.Location = new System.Drawing.Point(220, 292);
+            this.txtHeaderValue.Name = "txtHeaderValue";
+            this.txtHeaderValue.Size = new System.Drawing.Size(150, 20);
+            this.txtHeaderValue.TabIndex = 11;
+            // 
+            // btnSetHeader
+            // 
+            this.btnSetHeader.Location = new System.Drawing.Point(58, 325);
+            this.btnSetHeader.Name = "btnSetHeader";
+            this.btnSetHeader.Size = new System.Drawing.Size(132, 23);
+            this.btnSetHeader.TabIndex = 12;
+            this.btnSetHeader.Text = "Set header";
+            this.btnSetHeader.UseVisualStyleBackColor = true;
+            this.btnSetHeader.Click += new System.EventHandler(this.btnSetHeader_Click);
+            // 
+            // btnClearHeaders
+            // 
+            this.btnClearHeaders.Location = new System.Drawing.Point(220, 325);
+            this.btnClearHeaders.Name = "btnClearHeaders";
+            this.btnClearHeaders.Size = new System.Drawing.Size(132, 23);
+            this.btnClearHeaders.TabIndex = 13;
+            this.btnClearHeaders.Text = "Clear headers";
+            this.btnClearHeaders.UseVisualStyleBackColor = true;
+            this.btnClearHeaders.Click += new System.EventHandler(this.btnClearHeaders_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnClearHeaders);
+            this.Controls.Add(this.btnSetHeader);
+            this.Controls.Add(this.txtHeaderValue);
+            this.Controls.Add(this.lblHeaderValue);
+            this.Controls.Add(this.txtHeaderName);
+            this.Controls.Add(this.lblHeaderName);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblLastCheckValue);
             this.Controls.Add(this.lblLastCheck);
             this.Controls.Add(this.txtInterval);
             this.Controls.Add(this.lblInterval);
             this.Controls.Add(this.chkAutomaticChecks);
+            this.Controls.Add(this.btnCheckUpdateWithoutUI);
             this.Controls.Add(this.btnCheckUpdate);
             this.Name = "Form1";
             this.Text = "UpSparkle WinForms Demo";
@@ -129,11 +205,18 @@ namespace UpSparkleDemos.WinFormsDemo
         #endregion
 
         private System.Windows.Forms.Button btnCheckUpdate;
+        private System.Windows.Forms.Button btnCheckUpdateWithoutUI;
         private System.Windows.Forms.CheckBox chkAutomaticChecks;
         private System.Windows.Forms.Label lblInterval;
         private System.Windows.Forms.TextBox txtInterval;
         private System.Windows.Forms.Label lblLastCheck;
         private System.Windows.Forms.Label lblLastCheckValue;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Label lblHeaderName;
+        private System.Windows.Forms.TextBox txtHeaderName;
+        private System.Windows.Forms.Label lblHeaderValue;
+        private System.Windows.Forms.TextBox txtHeaderValue;
+        private System.Windows.Forms.Button btnSetHeader;
+        private System.Windows.Forms.Button btnClearHeaders;
     }
 }
