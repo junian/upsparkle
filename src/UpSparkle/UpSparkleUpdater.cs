@@ -102,6 +102,42 @@ namespace UpSparkle
         }
 
         /// <summary>
+        /// Occurs when the native updater encounters an error. Subscribers are invoked
+        /// on the main thread. The event is not raised for the normal "no update found"
+        /// outcome or for a user-canceled installation.
+        /// </summary>
+        public event EventHandler Error
+        {
+            add
+            {
+                errorOccurred += value;
+                EnsureErrorCallbackRegistered();
+            }
+            remove
+            {
+                errorOccurred -= value;
+            }
+        }
+
+        private event EventHandler errorOccurred;
+
+        private NativeSparkleCallback.NativeSparkleErrorCallback errorCallbackHandler;
+
+        private void EnsureErrorCallbackRegistered()
+        {
+            if (errorCallbackHandler == null)
+            {
+                errorCallbackHandler = RaiseErrorOccurred;
+                nativeSparkle.SetErrorCallback(errorCallbackHandler);
+            }
+        }
+
+        private void RaiseErrorOccurred()
+        {
+            errorOccurred?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// Initializes the native updater by resolving application details from the supplied
         /// assembly's attributes. The appcast URL and EdDSA public key can be embedded in the
         /// assembly via <see cref="AssemblyMetadataAttribute"/> (set in the <c>.csproj</c> or
@@ -261,6 +297,45 @@ namespace UpSparkle
             }
 
             nativeSparkle.CheckUpdateWithUI();
+        }
+
+        /// <summary>
+        /// Triggers an update check in the background without user interface feedback.
+        /// Use with caution and generally not recommended: by default the native updater
+        /// checks for updates automatically, and calling this manually may interfere
+        /// with its scheduler.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the updater has not been initialized via <see cref="Initialize()"/>.
+        /// </exception>
+        public void CheckUpdateWithoutUI()
+        {
+            if (!IsInitialized)
+            {
+                throw new InvalidOperationException($"{nameof(UpSparkle)} is not initialized");
+            }
+
+            nativeSparkle.CheckUpdateWithoutUI();
+        }
+
+        /// <summary>
+        /// Sets an HTTP header to be sent with update requests (appcast checks, release
+        /// note downloads, and update downloads). Calling again with the same name
+        /// replaces the previous value.
+        /// </summary>
+        /// <param name="name">The HTTP header name.</param>
+        /// <param name="value">The HTTP header value.</param>
+        public void SetHttpHeader(string name, string value)
+        {
+            nativeSparkle.SetHttpHeader(name, value);
+        }
+
+        /// <summary>
+        /// Clears all HTTP headers previously set via <see cref="SetHttpHeader"/>.
+        /// </summary>
+        public void ClearHttpHeaders()
+        {
+            nativeSparkle.ClearHttpHeaders();
         }
 
         /// <summary>
