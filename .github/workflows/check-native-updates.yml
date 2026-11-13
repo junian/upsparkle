@@ -1,0 +1,98 @@
+name: Check native library updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run once a day at 04:17 UTC.
+    - cron: '17 4 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: check-native-lib-updates
+  cancel-in-progress: true
+
+jobs:
+  check-native-lib-updates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '11.0.x'
+
+      - name: Update .gitbinmodules with the latest Sparkle, libMacSparkle, and WinSparkle
+        id: versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet run scripts/update_native_versions.cs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- .gitbinmodules; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes to .gitbinmodules."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff -- .gitbinmodules
+          fi
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPARKLE_VERSION: ${{ steps.versions.outputs.sparkle_version }}
+          MACSPARKLE_VERSION: ${{ steps.versions.outputs.libmacsparkle_version }}
+          WINSPARKLE_VERSION: ${{ steps.versions.outputs.winsparkle_version }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          BRANCH="automation/sparkle-${SPARKLE_VERSION}-macsparkle-${MACSPARKLE_VERSION}-winsparkle-${WINSPARKLE_VERSION}"
+          TITLE="Update Sparkle to ${SPARKLE_VERSION}, libMacSparkle to ${MACSPARKLE_VERSION}, and WinSparkle to ${WINSPARKLE_VERSION}"
+
+          # Do not recreate a pull request that was already opened or closed for these versions.
+          PR_STATE=$(gh pr list --head "$BRANCH" --state all --json state --jq '.[0].state // ""')
+          if [ -n "$PR_STATE" ]; then
+            echo "A pull request for $BRANCH already exists (state: $PR_STATE). Nothing to do."
+            exit 0
+          fi
+
+          git switch -c "$BRANCH"
+          git add .gitbinmodules
+          git commit -m "$TITLE"
+          git push --force origin "$BRANCH"
+
+          gh pr create \
+            --base "${DEFAULT_BRANCH:-master}" \
+            --head "$BRANCH" \
+            --title "$TITLE" \
+            --body "$(cat <<EOF
+          Automated native library release check.
+
+          This pull request updates \`.gitbinmodules\` with the latest archives:
+
+          - **Sparkle ${SPARKLE_VERSION}** — \`Sparkle-${SPARKLE_VERSION}.tar.xz\`
+            (<https://github.com/sparkle-project/Sparkle/releases/latest>)
+          - **libMacSparkle ${MACSPARKLE_VERSION}** — \`libMacSparkle.v${MACSPARKLE_VERSION}.zip\`
+            (<https://github.com/junian/libmacsparkle/releases/latest>)
+          - **WinSparkle ${WINSPARKLE_VERSION}** — \`WinSparkle-${WINSPARKLE_VERSION}.zip\`
+            (<https://github.com/vslavik/winsparkle/releases/latest>)
+
+          ### Review checklist
+          - [ ] Run \`./getlibs.sh\` (or \`Get-Libraries.ps1\`) and verify the archives extract into \`runtimes/\`
+          - [ ] Run \`dotnet test\`
+          - [ ] Update the version references in \`CHANGELOG.md\` if this should be a new package release
+          EOF
+          )"
