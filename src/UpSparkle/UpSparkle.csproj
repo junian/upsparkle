@@ -27,9 +27,7 @@
     -->
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <!--
-    <PackageIcon>standard-licensing-logo.png</PackageIcon>
-    -->
+    <PackageIcon>upsparkle-icon.png</PackageIcon>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <CLSCompliant>True</CLSCompliant>
@@ -49,9 +47,7 @@
     <None Include="build\UpSparkle.targets"
         Pack="true"
         PackagePath="build\UpSparkle.targets" />
-    <!--
-    <None Include="..\..\assets\img\standard-licensing-logo.png" Pack="true" PackagePath="\" />
-    -->
+    <None Include="..\..\docs\assets\img\upsparkle-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <!-- Expose Internals to Tests -->

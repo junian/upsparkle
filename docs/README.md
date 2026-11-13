@@ -1,5 +1,7 @@
 <div align="center">
 
+![UpSparkle Logo](https://raw.githubusercontent.com/junian/upsparkle/master/docs/assets/img/upsparkle-icon.png)
+
 # UpSparkle
 
 Thin .NET wrapper around [WinSparkle](https://winsparkle.org) (Windows) and [Sparkle](https://sparkle-project.org) (macOS). One NuGet package, two platforms.
