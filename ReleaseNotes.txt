@@ -1,28 +1,30 @@
-UpSparkle 1.0.6.0 - 2026-07-30
+UpSparkle 1.1.1.0 - 2026-11-13
 
 Added
 
-- UpSparkleUpdater: single public class with a unified API for Windows and macOS.
-- Initialize(Assembly, appcastUrl, edDSAPublicKey): reads company, app name, and version
-  from standard assembly attributes. Falls back to AssemblyMetadata entries with keys
-  SUFeedURL and SUPublicEDKey when appcastUrl/edDSAPublicKey are not passed directly.
-- InitializeAsync: async counterpart of Initialize.
-- CheckUpdateWithUI / CheckUpdateWithUIAsync: opens the native update dialog.
-- Dispose: shuts down the native updater and releases native resources.
-- Properties populated after Initialize: IsInitialized, AppcastUrl, EdDSAPublicKey,
-  CompanyName, AppName, AppVersion.
-- Constants AppcastUrlMetadataKey (SUFeedURL) and EdDSAPublicKeyMetadataKey (SUPublicEDKey).
-- Windows backend wrapping WinSparkle 0.9.3, with automatic x86/x64/Arm64 detection.
-- macOS / Mac Catalyst backend wrapping Sparkle 2.9.4 via libMacSparkle 1.0.9.
-- netstandard2.0 target, compatible with .NET Framework 4.6.2+ and .NET 6+.
-- Native binaries for win-x86, win-x64, win-arm64, and osx bundled using the standard
-  NuGet runtimes/ layout — no manual DLL copying needed.
+- Automatic update settings: IsAutomaticCheckForUpdates, UpdateCheckInterval, and
+  LastCheckTime on UpSparkleUpdater.
+- CheckUpdateWithoutUI(): triggers a background update check without the progress UI.
+- SetHttpHeader / ClearHttpHeaders: attach custom HTTP headers to appcast checks,
+  release-note downloads, and update downloads.
+- Error event, raised when the native updater reports a failure. The normal
+  "no update found" outcome and user-cancelled installations are not reported.
+- Eto Forms demo covering the Gtk, macOS, and WPF backends.
+- Daily GitHub Actions workflow that checks Sparkle, libMacSparkle, and WinSparkle
+  releases and opens a pull request when a newer version is available.
+- NuGet package icon.
 
 Changed
 
-- Refined Sparkle framework extraction and macOS app bundle integration.
-- Improved NuGet build metadata and runtime asset packaging for Sparkle/WinSparkle.
-- Merged the old UpSparkle.Mac and UpSparkle.Windows projects into a single library with
-  runtime platform dispatch.
-- Switched native loading from static DllImport to dynamic LoadLibrary/dlopen to support
-  the NuGet runtimes/ layout.
+- Updated native dependencies: Sparkle 2.10.1, libMacSparkle 1.2.0, WinSparkle 0.9.4.
+- Moved the demo projects from src/Demos/ to the top-level examples/ directory.
+- Expanded the demo applications with automatic-check, interval, last-check,
+  HTTP-header, and background-check controls.
+- Expanded the test suite from 30 to 36 tests.
+- Updated the README API reference to document the complete public surface.
+
+Fixed
+
+- The Error event no longer fires for "no update found" or user-cancelled
+  installations.
+- Native callbacks are safe under Mono AOT / IL2CPP via MonoPInvokeCallback.

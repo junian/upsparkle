@@ -18,7 +18,7 @@
   </ItemGroup>
     
   <ItemGroup>
-    <ProjectReference Include="..\..\src\UpSparkle\UpSparkle.csproj" />
+    <PackageReference Include="UpSparkle" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

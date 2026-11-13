@@ -294,51 +294,92 @@ public class UpSparkleUpdater : IDisposable
 new UpSparkleUpdater()
 ```
 
-Creates a new updater instance. The native backend is not started until `Initialize` is called.
+Creates a new updater instance and loads the platform's native backend. The updater is not started until `Initialize` is called.
 
-#### Methods
+#### Initialization
 
 ```csharp
 void Initialize(Assembly assemblyInfo, string appcastUrl = null, string edDSAPublicKey = null)
+Task InitializeAsync(Assembly assemblyInfo, string appcastUrl = null, string edDSAPublicKey = null)
 ```
 
-Starts the native Sparkle / WinSparkle framework. Reads company name, app name, and version from the assembly's standard attributes. `appcastUrl` and `edDSAPublicKey` are resolved from parameters first, then from `AssemblyMetadata` entries with keys `"SUFeedURL"` and `"SUPublicEDKey"` respectively.
+Starts the native Sparkle / WinSparkle framework. Reads the company name, app name, and version from `AssemblyCompanyAttribute`, `AssemblyProductAttribute`, and `AssemblyInformationalVersionAttribute`. Any build-metadata suffix (e.g. `1.0.0+abc123`) is stripped from the version.
 
-Throws `ArgumentNullException` if `assemblyInfo` is null. Throws `ArgumentException` if a required value cannot be resolved.
+`appcastUrl` and `edDSAPublicKey` are resolved from the parameters first, then from `AssemblyMetadata` entries with keys `"SUFeedURL"` and `"SUPublicEDKey"`.
+
+Throws `ArgumentNullException` if `assemblyInfo` is null, and `ArgumentException` if a required value cannot be resolved.
+
+`InitializeAsync` is a convenience wrapper that calls `Initialize` and returns a completed task.
+
+> **macOS note:** Sparkle reads configuration from the app bundle's `Info.plist`. The `edDSAPublicKey` parameter is used on Windows only; on macOS, embed `SUPublicEDKey` in `Info.plist` instead.
+
+#### Update checks
 
 ```csharp
 void CheckUpdateWithUI()
+Task CheckUpdateWithUIAsync()
+void CheckUpdateWithoutUI()
 ```
 
-Opens the native update UI. Throws `InvalidOperationException` if called before `Initialize`.
+`CheckUpdateWithUI()` opens the native update dialog. `CheckUpdateWithoutUI()` performs a check in the background without the progress window. Both throw `InvalidOperationException` if called before `Initialize`.
+
+> Manual background checks can interfere with the native scheduler. Prefer automatic checks unless you have a specific reason to trigger one.
+
+#### HTTP headers
+
+```csharp
+void SetHttpHeader(string name, string value)
+void ClearHttpHeaders()
+```
+
+Adds or replaces a header sent with appcast requests, release-note downloads, and update downloads. `ClearHttpHeaders()` removes every header previously set. Calling `SetHttpHeader` again with the same name replaces its value.
+
+#### Properties
+
+| Property | Type | Access | Description |
+|----------|------|--------|-------------|
+| `IsInitialized` | `bool` | get | `true` after a successful `Initialize` call. |
+| `AppcastUrl` | `string` | get | Appcast URL resolved during initialization. |
+| `EdDSAPublicKey` | `string` | get | EdDSA public key resolved during initialization. |
+| `CompanyName` | `string` | get | Company name from the assembly. |
+| `AppName` | `string` | get | Product name from the assembly. |
+| `AppVersion` | `string` | get | Version from the assembly. |
+| `IsAutomaticCheckForUpdates` | `bool` | get/set | Whether the native updater checks for updates automatically. |
+| `UpdateCheckInterval` | `int` | get/set | Interval between automatic checks, in seconds. |
+| `LastCheckTime` | `DateTime?` | get | UTC time of the last check, or `null` if updates have never been checked. |
+
+The string properties return `null` before `Initialize` is called. The update settings reflect the native defaults until changed.
+
+#### Events
+
+```csharp
+event EventHandler Error
+```
+
+Raised when the native updater encounters an error. The normal "no update found" outcome and user-cancelled installations are not reported. Subscribers are invoked on the main thread.
+
+#### `Dispose()`
 
 ```csharp
 void Dispose()
 ```
 
-Shuts down the native updater and releases native resources. Resets `IsInitialized` to `false`.
+Shuts down the native updater and releases native resources. Resets `IsInitialized` to `false`. On Windows this calls `win_sparkle_cleanup()`; on macOS it is a no-op because Sparkle manages its own lifetime.
 
-#### Properties
+#### Threading
 
-```csharp
-bool IsInitialized { get; }
-string AppcastUrl { get; }
-string EdDSAPublicKey { get; }
-string CompanyName { get; }
-string AppName { get; }
-string AppVersion { get; }
-```
+The native macOS functions must be called on the main thread. Call `Initialize`, `CheckUpdate*`, the header methods, and the property setters from the UI thread. WinSparkle manages its own background thread once initialized.
 
-All properties return `null` before `Initialize` is called.
+#### Configuration keys
 
-#### Constants
+UpSparkle reads two `AssemblyMetadata` entries on Windows and the matching `Info.plist` keys on macOS:
 
-```csharp
-const string SUFeedURL = nameof(SUFeedURL);
-const string SUPublicEDKey = nameof(SUPublicEDKey);
-```
+| Key | Purpose |
+|-----|---------|
+| `SUFeedURL` | URL of the appcast XML feed. |
+| `SUPublicEDKey` | Base64-encoded EdDSA public key used to verify update signatures. |
 
-Keys used to look up `AssemblyMetadata` values from the assembly. Match the corresponding `Info.plist` keys on macOS. These live in the internal `UpSparkle.UpSparkleSettings` class.
+The remaining Sparkle options (`SUEnableAutomaticChecks`, `SUScheduledCheckInterval`, `SUAutomaticallyUpdate`, `SUShowReleaseNotes`, and others) are documented in the [Sparkle customization guide](https://sparkle-project.org/documentation/customization/).
 
 ## Supported Platforms
 
@@ -353,6 +394,8 @@ Tested project types:
 **Windows** — WinForms, WPF, WinUI, Avalonia UI, MAUI (WinUI)
 
 **macOS** — .NET macOS, MAUI (Mac Catalyst), Avalonia UI, Uno Platform
+
+**Cross-platform** — Eto Forms (Gtk, macOS, WPF)
 
 ## Appcast & Signing
 

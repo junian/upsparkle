@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-11-13
+
+### Added
+
+- Automatic update settings on both platforms:
+  - `IsAutomaticCheckForUpdates` — enable or disable scheduled update checks.
+  - `UpdateCheckInterval` — polling interval in seconds.
+  - `LastCheckTime` — UTC timestamp of the last check, or `null` when updates have never been checked.
+- `CheckUpdateWithoutUI()` — triggers a background update check without the progress UI.
+- `SetHttpHeader(string name, string value)` and `ClearHttpHeaders()` — attach custom HTTP headers to appcast checks, release-note downloads, and update downloads.
+- `Error` event — raised when the native updater reports a failure. The normal "no update found" outcome and user-cancelled installations are not reported.
+- Internal `UpSparkleSettings` class containing the Sparkle `SU*` configuration keys.
+- Eto Forms demo covering the Gtk, macOS, and WPF backends.
+- `scripts/update_native_versions.cs` and a daily `check-native-updates.yml` workflow that opens a pull request when a newer Sparkle, libMacSparkle, or WinSparkle release is available.
+- NuGet package icon.
+
+### Changed
+
+- Updated native dependencies:
+  - Sparkle 2.9.4 → 2.10.1
+  - libMacSparkle 1.0.9 → 1.2.0 (adds HTTP header and error-callback support)
+  - WinSparkle 0.9.3 → 0.9.4
+- Moved the demo projects from `src/Demos/` to the top-level `examples/` directory.
+- Expanded the demo applications with automatic-check, interval, last-check, HTTP-header, and background-check controls.
+- Expanded the test suite from 30 to 36 tests.
+- Updated the README API reference to document the complete public surface.
+
+### Fixed
+
+- The `Error` event no longer fires for "no update found" or user-cancelled installations.
+- Native callbacks are safe under Mono AOT / IL2CPP via `MonoPInvokeCallback`.
+
 ## [1.0.6] - 2026-07-30
 
 ### Added
@@ -37,4 +69,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Native library loading moved to a dynamic `LoadLibrary` / `dlopen` approach, replacing static `[DllImport]` declarations, to support the NuGet `runtimes/` layout without requiring a build-time reference.
 - `runtimes/` directory structure adopted to follow standard .NET NuGet native-asset conventions.
 
+[1.1.1]: https://github.com/junian/upsparkle/releases/tag/v1.1.1
 [1.0.6]: https://github.com/junian/upsparkle/releases/tag/v1.0.6

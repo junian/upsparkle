@@ -21,10 +21,8 @@
     <Copyright>Copyright (c) 2026</Copyright>
     <RepositoryUrl>https://github.com/junian/upsparkle</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <!--
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Standard.Licensing.snk</AssemblyOriginatorKeyFile>
-    -->
+    <AssemblyOriginatorKeyFile>UpSparkle.snk</AssemblyOriginatorKeyFile>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageIcon>upsparkle-icon.png</PackageIcon>
@@ -33,7 +31,7 @@
     <CLSCompliant>True</CLSCompliant>
     
     <!-- Versions -->
-    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
     <PackageVersion>$(AssemblyVersion)</PackageVersion>
     <ReleaseVersion>$(AssemblyVersion)</ReleaseVersion>
     <Version>$(AssemblyVersion)</Version>
@@ -51,11 +49,13 @@
   </ItemGroup>
 
   <!-- Expose Internals to Tests -->
+   <!--
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>UpSparkle.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+  -->
 
   <!-- Sparkle (macOS) -->
   <ItemGroup>
